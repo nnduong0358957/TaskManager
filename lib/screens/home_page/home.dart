@@ -13,6 +13,7 @@ import 'package:todo_list_app/components/color_loader_2.dart';
 import 'package:todo_list_app/screens/home_page/findByTags.dart';
 import 'package:todo_list_app/screens/home_page/list_expansion.dart';
 import 'package:todo_list_app/modules/NotificationService.dart';
+import 'package:cron/cron.dart';
 
 class MyHomePage extends StatefulWidget {
   MyHomePage({this.auth, this.onSignOut, this.app});
@@ -58,6 +59,7 @@ class _MyHomePageState extends State<MyHomePage> {
       alertStatusTask();
 
       notification();
+      refreshEveryMinute();
       return DefaultTabController(
           length: 3,
           child: SafeArea(
@@ -536,6 +538,16 @@ class _MyHomePageState extends State<MyHomePage> {
             .child(path)
             .child(task["key"])
             .update({"isShow": true, "status": false});
+      });
+    });
+  }
+
+  void refreshEveryMinute() {
+    var cron = new Cron();
+    cron.schedule(new Schedule.parse('* * * * *'), () async {
+      print("@@@@@@@@@@@@@@@@");
+      listTask.forEach((element) {
+        if (element["status"] == true) checkIsShow(element);
       });
     });
   }
