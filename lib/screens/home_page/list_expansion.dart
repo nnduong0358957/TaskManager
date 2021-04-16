@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:implicitly_animated_reorderable_list/transitions.dart';
 import 'package:todo_list_app/constants.dart';
 import 'package:todo_list_app/modules/task.dart';
@@ -51,8 +52,11 @@ class _ListExpansionState extends State<ListExpansion> {
         ),
         title: Text(
           widget.title,
-          style: TextStyle(
-              fontWeight: FontWeight.bold, fontSize: 20, color: kPrimaryColor),
+          style: GoogleFonts.lato(
+              fontSize: 20,
+              fontWeight: FontWeight.w700,
+              fontStyle: FontStyle.italic,
+              color: kPrimaryColor),
         ),
         expandedAlignment: Alignment.topLeft,
         children: [
@@ -63,22 +67,15 @@ class _ListExpansionState extends State<ListExpansion> {
             // The current items in the list.
             items: widget.listTask,
             insertDuration: Duration(seconds: 1, milliseconds: 40),
-            removeDuration: Duration(seconds: 1, milliseconds: 40),
-            updateDuration: Duration(seconds: 1),
-            // Called by the DiffUtil to decide whether two object represent the same item.
-            // For example, if your items have unique ids, this method should check their id equality.
+            removeDuration: Duration(seconds: 1),
+            updateDuration: Duration(seconds: 0),
             areItemsTheSame: (a, b) => a["key"] == b["key"],
-            // Called, as needed, to build list item widgets.
-            // List items are only built when they're scrolled into view.
             itemBuilder: (context, animation, item, index) {
-              // Specifiy a transition to be used by the ImplicitlyAnimatedList.
-              // See the Transitions section on how to import this transition.
               return SlideTransition(
-                position: animation.drive(
-                    Tween<Offset>(begin: Offset(1, 0), end: Offset(0, 0))
-                        .chain(CurveTween(curve: Curves.easeInOutBack))),
-                child: TaskInList(task: widget.listTask[index])
-              );
+                  position: animation.drive(
+                      Tween<Offset>(begin: Offset(1, 0), end: Offset(0, 0))
+                          .chain(CurveTween(curve: Curves.easeInOutBack))),
+                  child: TaskInList(task: widget.listTask[index]));
               // return SizeFadeTransition(
               //   sizeFraction: 0.7,
               //   curve: Curves.easeInOut,
@@ -86,9 +83,6 @@ class _ListExpansionState extends State<ListExpansion> {
               //   child: TaskInList(task: widget.listTask[index])
               // );
             },
-            // An optional builder when an item was removed from the list.
-            // If not specified, the List uses the itemBuilder with
-            // the animation reversed.
             removeItemBuilder: (context, animation, oldItem) {
               return FadeTransition(
                   opacity: animation, child: TaskInList(task: oldItem));

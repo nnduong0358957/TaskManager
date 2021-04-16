@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:todo_list_app/constants.dart';
 
 class SetTimeButton extends StatefulWidget {
   const SetTimeButton(
@@ -29,7 +30,9 @@ class _SetTimeButtonState extends State<SetTimeButton> {
               onPressed: () {
                 widget.ChangeSelectedTime();
               },
-              child: Text("Remove")),
+              child: Text("Remove", style: TextStyle(
+                color: Colors.red[700]
+              ),)),
         ),
       );
     else {
@@ -43,13 +46,14 @@ class _SetTimeButtonState extends State<SetTimeButton> {
                 child: RaisedButton(
                   child: Row(
                     children: [
-                      Icon(Icons.date_range),
+                      Icon(Icons.date_range, color: kPrimaryColor,),
                       Padding(
                         padding: const EdgeInsets.only(left: 4.0),
                         child: Text(
                           "Set time",
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
+                            color: kPrimaryColor
                           ),
                         ),
                       ),

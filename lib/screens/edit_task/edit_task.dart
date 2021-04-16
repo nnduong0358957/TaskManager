@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:multi_select_flutter/multi_select_flutter.dart';
 import 'package:todo_list_app/constants.dart';
 import 'package:todo_list_app/screens/add_task_page/TypeSelect.dart';
@@ -105,8 +106,12 @@ class _EditPageState extends State<EditPage> {
             ),
             flexibleSpace: buildColorGradient(),
             title: Text(
-              "Edit Task",
-              style: TextStyle(fontSize: 20, color: kTextColor),
+              'Edit Task',
+              style: GoogleFonts.lato(
+                  fontSize: 30,
+                  fontWeight: FontWeight.w700,
+                  fontStyle: FontStyle.italic,
+                  color: kTextColor),
             ),
             actions: [
               Padding(
@@ -114,11 +119,12 @@ class _EditPageState extends State<EditPage> {
                 child: Center(
                   child: FlatButton(
                     child: Text(
-                      "Save",
-                      style: TextStyle(
-                          color: kTextColor,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 20),
+                      'Save',
+                      style: GoogleFonts.lato(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w700,
+                          fontStyle: FontStyle.italic,
+                          color: kTextColor),
                     ),
                     onPressed: () {
                       checkData();
@@ -217,8 +223,8 @@ class _EditPageState extends State<EditPage> {
                       ),
                     ),
                     Text(
-                      "REMIND ME ABOUT THIS",
-                      style: TextStyle(fontSize: 17),
+                      "REMIND ME WHEN:",
+                      style: TextStyle(fontSize: 16),
                     ),
                     SetTimeButton(
                         selectedDateTimeString: selectedDateTimeString,
@@ -271,8 +277,12 @@ class _EditPageState extends State<EditPage> {
                           child: Padding(
                             padding: const EdgeInsets.all(6.0),
                             child: Text(
-                              "Delete Task",
-                              style: TextStyle(color: Colors.red, fontSize: 16),
+                              'Add Task',
+                              style: GoogleFonts.lato(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w700,
+                                  fontStyle: FontStyle.italic,
+                                  color: Colors.red),
                             ),
                           ),
                           borderSide: BorderSide(color: Colors.red, width: 2),
@@ -288,9 +298,12 @@ class _EditPageState extends State<EditPage> {
                           child: Padding(
                             padding: const EdgeInsets.all(6.0),
                             child: Text(
-                              "Done",
-                              style: TextStyle(
-                                  color: Colors.lightGreen, fontSize: 16),
+                              'Done',
+                              style: GoogleFonts.lato(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w700,
+                                  fontStyle: FontStyle.italic,
+                                  color: Colors.lightGreen),
                             ),
                           ),
                           borderSide:
@@ -392,7 +405,9 @@ class _EditPageState extends State<EditPage> {
   void _selectTimeAlert() async {
     _selectedDate = await _selectDate(_selectedDate);
     if (_selectedDate == null) {
+      _selectedTime = null;
       selectedDateTimeString = null;
+      print("@@@@$_selectedDate");
       _showAlertDialog(context, "Error!!!", "You have not selected date");
       _refreshPage();
     } else {

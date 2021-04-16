@@ -27,6 +27,10 @@ class _SelectedDateOnOffState extends State<SelectedDateOnOff> {
       return Padding(
         padding: const EdgeInsets.only(bottom: 20),
         child: RaisedButton(
+          elevation: 2,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10)
+          ) ,
           onPressed: () {
             widget.selectTimeAlert();
           },

@@ -5,6 +5,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:todo_list_app/components/drawer.dart';
 import 'package:todo_list_app/constants.dart';
 import 'package:todo_list_app/screens/add_task_page/add_task.dart';
@@ -79,15 +80,17 @@ class _MyHomePageState extends State<MyHomePage> {
                     ],
                   ),
                   title: Text(
-                    "All Tasks",
-                    style: TextStyle(
-                      color: kTextColor,
-                    ),
+                    'All Tasks',
+                    style: GoogleFonts.lato(
+                        fontSize: 30,
+                        fontWeight: FontWeight.w700,
+                        fontStyle: FontStyle.italic,
+                        color: kTextColor),
                   ),
                 ),
                 floatingActionButton: Container(
-                  width: 80,
-                  height: 80,
+                  width: 100,
+                  height: 100,
                   child: FloatingActionButton(
                     onPressed: () {
                       Navigator.of(context).push(_createRoute());
@@ -95,7 +98,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     tooltip: 'Add task',
                     child: Icon(
                       Icons.add,
-                      size: 36,
+                      size: 50,
                     ),
                   ),
                 ),
@@ -121,7 +124,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             ),
                             SizedBox(
                               height: 200,
-                            )
+                            ),
                           ],
                         ),
                       ),
@@ -486,8 +489,8 @@ class _MyHomePageState extends State<MyHomePage> {
                           TextSpan(
                               text:
                                   " ${listTaskMiss[index]["title"]} on $stringDateTime",
-                              style:
-                                  TextStyle(color: Colors.yellow[800], fontSize: 22)),
+                              style: TextStyle(
+                                  color: Colors.yellow[800], fontSize: 22)),
                         ],
                       ),
                     );

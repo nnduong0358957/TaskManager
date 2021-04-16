@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:multi_select_flutter/multi_select_flutter.dart';
 import 'package:todo_list_app/constants.dart';
 import 'package:todo_list_app/screens/add_task_page/TypeSelect.dart';
@@ -64,8 +65,12 @@ class _AddPageState extends State<AddPage> {
             ),
             flexibleSpace: buildColorGradient(),
             title: Text(
-              "Add Task",
-              style: TextStyle(fontSize: 20, color: kTextColor),
+              'Add Task',
+              style: GoogleFonts.lato(
+                  fontSize: 30,
+                  fontWeight: FontWeight.w700,
+                  fontStyle: FontStyle.italic,
+                  color: kTextColor),
             ),
             actions: [
               Padding(
@@ -73,11 +78,12 @@ class _AddPageState extends State<AddPage> {
                 child: Center(
                   child: FlatButton(
                     child: Text(
-                      "Save",
-                      style: TextStyle(
-                          color: kTextColor,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 20),
+                      'Save',
+                      style: GoogleFonts.lato(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w700,
+                          fontStyle: FontStyle.italic,
+                          color: kTextColor),
                     ),
                     onPressed: () {
                       checkData();
@@ -176,8 +182,8 @@ class _AddPageState extends State<AddPage> {
                       ),
                     ),
                     Text(
-                      "REMIND ME ABOUT THIS",
-                      style: TextStyle(fontSize: 17),
+                      "REMIND ME WHEN:",
+                      style: TextStyle(fontSize: 16),
                     ),
                     SetTimeButton(
                         selectedDateTimeString: selectedDateTimeString,
@@ -298,6 +304,7 @@ class _AddPageState extends State<AddPage> {
   void _selectTimeAlert() async {
     _selectedDate = await _selectDate(_selectedDate);
     if (_selectedDate == null) {
+      _selectedTime = null;
       selectedDateTimeString = null;
       _showAlertDialog(context, "Error!!!", "You have not selected date");
       _refreshPage();

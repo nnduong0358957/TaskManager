@@ -51,8 +51,10 @@ class _AppDrawerState extends State<AppDrawer> {
           Align(
             alignment: Alignment.bottomLeft,
             child: ListTile(
-              leading: Icon(Icons.logout),
-              title: Text('Logout'),
+              leading: Icon(Icons.logout, color: Colors.red,),
+              title: Text('Logout', style: TextStyle(
+                color: Colors.red
+              ),),
               onTap: () {
                 _showDeleteYesNoDialog(
                     context, "", "Are you sure you want to log out?");
