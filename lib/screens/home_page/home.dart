@@ -413,11 +413,12 @@ class _MyHomePageState extends State<MyHomePage> {
   //Hàm thông báo có công việc
   void _showAlertDialog(BuildContext context, String content) {
     AlertDialog alertDialog = AlertDialog(
-      content: Container(
+      title: Container(
         width: 100,
         height: 100,
         child: Image.asset("assets/images/reminder.png"),
       ),
+      content: Text(content),
       actions: [
         FlatButton(onPressed: () => Navigator.pop(context), child: Text('Ok'))
       ],
@@ -462,16 +463,31 @@ class _MyHomePageState extends State<MyHomePage> {
                   shrinkWrap: true,
                   itemCount: listTaskMiss.length,
                   itemBuilder: (BuildContext context, int index) {
+                    DateTime taskMissDateTime =
+                        DateTime.parse(listTaskMiss[index]["dateTime"]);
+                    String stringTime;
+                    if (taskMissDateTime.hour >= 10)
+                      stringTime = "${taskMissDateTime.hour}";
+                    else
+                      stringTime = "0${taskMissDateTime.hour}";
+                    if (taskMissDateTime.minute >= 10)
+                      stringTime = stringTime + ":${taskMissDateTime.minute}";
+                    else
+                      stringTime = stringTime + ":0${taskMissDateTime.minute}";
+                    String stringDateTime =
+                        "${taskMissDateTime.day}/${taskMissDateTime.month}/${taskMissDateTime.year} at $stringTime";
+
                     return RichText(
                       text: TextSpan(
                         children: [
                           WidgetSpan(
-                            child: Icon(Icons.add, size: 20),
+                            child: Icon(Icons.album_outlined, size: 20),
                           ),
                           TextSpan(
-                              text: " ${listTaskMiss[index]["title"]}",
+                              text:
+                                  " ${listTaskMiss[index]["title"]} on $stringDateTime",
                               style:
-                                  TextStyle(color: Colors.black, fontSize: 22)),
+                                  TextStyle(color: Colors.yellow[800], fontSize: 22)),
                         ],
                       ),
                     );
