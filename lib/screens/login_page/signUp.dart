@@ -179,7 +179,7 @@ class _SignUpPageState extends State<SignUpPage> {
                                         child: FlatButton(
                                           onPressed: () =>
                                               Navigator.pop(context),
-                                          child: Text("Go back"),
+                                          child: Text("Back"),
                                         )),
                                     ButtonTheme(
                                       minWidth: 150,

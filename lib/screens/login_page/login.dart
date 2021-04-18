@@ -156,7 +156,7 @@ class _MyLoginPageState extends State<MyLoginPage> {
                                 "Create an Account",
                                 style: TextStyle(color: Colors.orange[800]),
                               ),
-                            )
+                            ),
                           ],
                         ),
                       ),

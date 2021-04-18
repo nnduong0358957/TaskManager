@@ -545,7 +545,6 @@ class _MyHomePageState extends State<MyHomePage> {
   void refreshEveryMinute() {
     var cron = new Cron();
     cron.schedule(new Schedule.parse('* * * * *'), () async {
-      print("@@@@@@@@@@@@@@@@");
       listTask.forEach((element) {
         if (element["status"] == true) checkIsShow(element);
       });
