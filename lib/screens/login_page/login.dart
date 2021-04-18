@@ -7,6 +7,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:todo_list_app/components/color_loader_2.dart';
 import 'package:todo_list_app/screens/home_page/home.dart';
+import 'package:todo_list_app/screens/login_page/forgot_pass.dart';
 import 'package:todo_list_app/screens/login_page/signUp.dart';
 import 'package:todo_list_app/constants.dart';
 import 'package:connectivity/connectivity.dart';
@@ -143,6 +144,19 @@ class _MyLoginPageState extends State<MyLoginPage> {
                             ),
                             SizedBox(
                               height: 30,
+                            ),
+                            FlatButton(
+                              onPressed: () {
+                                Navigator.push(context,
+                                    MaterialPageRoute(builder: (context) {
+                                  // do something
+                                  return ForgotPass();
+                                }));
+                              },
+                              child: Text(
+                                "Forgot password?",
+                                style: TextStyle(color: kPrimaryColor),
+                              ),
                             ),
                             FlatButton(
                               onPressed: () {
