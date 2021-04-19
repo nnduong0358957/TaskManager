@@ -17,7 +17,6 @@ class _AppDrawerState extends State<AppDrawer> {
   @override
   Widget build(BuildContext context) {
     final currentUser = widget.auth.currentUser;
-    print(currentUser);
     return Drawer(
       child: ListView(
         padding: EdgeInsets.zero,

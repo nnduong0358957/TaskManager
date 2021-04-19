@@ -118,6 +118,14 @@ class _ForgotPassState extends State<ForgotPass> {
                                                     error = true;
                                                   });
                                                 }
+                                                if (e.code ==
+                                                    "user-not-found") {
+                                                  _showAlertDialog(context,
+                                                      "User not found. You entered your email incorrectly or is not registered");
+                                                  setState(() {
+                                                    error = true;
+                                                  });
+                                                }
                                               });
                                               if (error != true)
                                                 _showDialogResetPass(context);
@@ -166,7 +174,10 @@ class _ForgotPassState extends State<ForgotPass> {
         height: 100,
         child: Image.asset("assets/images/warning.png"),
       ),
-      content: Text(content),
+      content: Text(
+        content,
+        style: TextStyle(color: Colors.red[800]),
+      ),
       actions: [
         FlatButton(onPressed: () => Navigator.pop(context), child: Text('Ok'))
       ],
