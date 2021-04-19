@@ -29,7 +29,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   bool refresh = true;
   var ref;
-  bool showDialogRemind = false, showDialogMiss = false;
+  bool checkWhenOpen = false;
   String isDone;
   String path;
   List<dynamic> listTask = [];
@@ -52,9 +52,11 @@ class _MyHomePageState extends State<MyHomePage> {
     print("Create HomePage");
 
     if (isDone != null) {
-      listTask.forEach((element) {
-        if (element["status"] == true) checkIsShow(element);
-      });
+      if (checkWhenOpen == false) {
+        listTask.forEach((element) {
+          if (element["status"] == true) checkIsShow(element);
+        });
+      }
 
       alertStatusTask();
 
@@ -238,6 +240,7 @@ class _MyHomePageState extends State<MyHomePage> {
     // Nếu bật app lên trong thời gian chờ xác nhận thông báo thì hiển thị
     // dialog báo có công việc ngay bây giờ
     if (timeWaitNotification.isAfter(now) && now.isAfter(taskDateTime)) {
+      print("set miss false, show false");
       await ref
           .child(path)
           .child(task["key"])
@@ -299,6 +302,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void alertStatusTask() {
     List<dynamic> listTaskMiss = [], listRemind = [];
+
     listTask.forEach((element) {
       // Thêm vào list Task bị MISS
       if (element["isMiss"] == true &&
@@ -311,19 +315,18 @@ class _MyHomePageState extends State<MyHomePage> {
       // Thêm vào list Task đã nhận được
       if (element["isShow"] == false && element["isMiss"] == false) {
         listRemind.add(element);
+        ref
+            .child(path)
+            .child(element["key"])
+            .update({"isShow": true, "status": false});
       }
     });
-    if (listTaskMiss.length != 0 && showDialogMiss == false) {
+    if (listTaskMiss.length != 0) {
       _showAlert(listTaskMiss);
-      setState(() {
-        showDialogMiss = true;
-      });
     }
-    if (listRemind.length != 0 && showDialogRemind == false) {
+
+    if (listRemind.length != 0) {
       remindTask(listRemind);
-      setState(() {
-        showDialogRemind = true;
-      });
     }
   }
 
@@ -534,19 +537,18 @@ class _MyHomePageState extends State<MyHomePage> {
     listRemind.forEach((task) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _showAlertDialog(context, "You should to do ${task["title"]} now!");
-        ref
-            .child(path)
-            .child(task["key"])
-            .update({"isShow": true, "status": false});
       });
     });
   }
 
   void refreshEveryMinute() {
+    print("check dialog");
     var cron = new Cron();
     cron.schedule(new Schedule.parse('* * * * *'), () async {
       listTask.forEach((element) {
         if (element["status"] == true) checkIsShow(element);
+
+        alertStatusTask();
       });
     });
   }
