@@ -10,6 +10,7 @@ import 'package:todo_list_app/components/drawer.dart';
 import 'package:todo_list_app/constants.dart';
 import 'package:todo_list_app/screens/add_task_page/add_task.dart';
 import 'package:todo_list_app/components/color_loader_2.dart';
+import 'package:todo_list_app/screens/home_page/calendar/events_calendar.dart';
 import 'package:todo_list_app/screens/home_page/findByTags.dart';
 import 'package:todo_list_app/screens/home_page/list_expansion.dart';
 import 'package:todo_list_app/modules/NotificationService.dart';
@@ -63,7 +64,7 @@ class _MyHomePageState extends State<MyHomePage> {
       notification();
       refreshEveryMinute();
       return DefaultTabController(
-          length: 3,
+          length: 4,
           child: SafeArea(
             child: Scaffold(
                 drawer:
@@ -72,6 +73,9 @@ class _MyHomePageState extends State<MyHomePage> {
                   flexibleSpace: buildColorGradient(),
                   bottom: TabBar(
                     tabs: [
+                      Tab(
+                        icon: Icon(Icons.calendar_today_rounded),
+                      ),
                       Tab(
                         icon: Icon(Icons.access_time),
                       ),
@@ -106,50 +110,54 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                   ),
                 ),
-                body: Container(
-                  decoration: BoxDecoration(
-                      image: DecorationImage(
-                          image: AssetImage("assets/images/bg_home.jpg"),
-                          fit: BoxFit.cover)),
-                  child: TabBarView(
-                    children: [
-                      SingleChildScrollView(
+                body: TabBarView(
+                  children: [
+                    SingleChildScrollView(
                         child: Column(
-                          children: [
-                            ListExpansion(
-                                title: "Today",
-                                listTask: listCategory["Today"]),
-                            ListExpansion(
-                                title: "Tomorrow",
-                                listTask: listCategory["Tomorrow"]),
-                            ListExpansion(
-                              title: "Upcoming",
-                              listTask: listCategory["Upcoming"],
-                            ),
-                            SizedBox(
-                              height: 200,
-                            ),
-                          ],
+                      children: [
+                        Container(
+                            height: MediaQuery.of(context).size.height,
+                            child: TableEvents(listTask: listTask)),
+                        SizedBox(
+                          height: 200,
                         ),
+                      ],
+                    )),
+                    SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          ListExpansion(
+                              title: "Today", listTask: listCategory["Today"]),
+                          ListExpansion(
+                              title: "Tomorrow",
+                              listTask: listCategory["Tomorrow"]),
+                          ListExpansion(
+                            title: "Upcoming",
+                            listTask: listCategory["Upcoming"],
+                          ),
+                          SizedBox(
+                            height: 200,
+                          ),
+                        ],
                       ),
-                      SingleChildScrollView(
-                        child: Column(
-                          children: [
-                            ListExpansion(
-                                title: "One Time",
-                                listTask: listCategory["One Time"]),
-                            ListExpansion(
-                                title: "Repeat",
-                                listTask: listCategory["Repeat"]),
-                            SizedBox(
-                              height: 200,
-                            )
-                          ],
-                        ),
+                    ),
+                    SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          ListExpansion(
+                              title: "One Time",
+                              listTask: listCategory["One Time"]),
+                          ListExpansion(
+                              title: "Repeat",
+                              listTask: listCategory["Repeat"]),
+                          SizedBox(
+                            height: 200,
+                          )
+                        ],
                       ),
-                      FindByTags(listTask: listTask),
-                    ],
-                  ),
+                    ),
+                    FindByTags(listTask: listTask),
+                  ],
                 )),
           ));
     } else
@@ -202,6 +210,7 @@ class _MyHomePageState extends State<MyHomePage> {
             "isMiss": value["isMiss"],
             "isShow": value["isShow"],
             "isAlertMiss": value["isAlertMiss"],
+            "isAlertRemind": value["isAlertRemind"]
           };
 
           if (value["isDeleted"] == false) {
@@ -239,12 +248,23 @@ class _MyHomePageState extends State<MyHomePage> {
 
     // Nếu bật app lên trong thời gian chờ xác nhận thông báo thì hiển thị
     // dialog báo có công việc ngay bây giờ
-    if (timeWaitNotification.isAfter(now) && now.isAfter(taskDateTime)) {
-      print("set miss false, show false");
+    if (timeWaitNotification.isAfter(now) &&
+        now.isAfter(taskDateTime) &&
+        task["isAlertRemind"] == false) {
       await ref
           .child(path)
           .child(task["key"])
-          .update({"isMiss": false, "isShow": false});
+          .update({"isMiss": false, "isShow": true, "isAlertRemind": false});
+    }
+
+    // Lệnh bật thông báo MISS
+    // Nếu waitTime < now => isShow = true
+    if (timeWaitNotification.isBefore(now) && task["isAlertMiss"] == false) {
+      await ref.child(path).child(task["key"]).update({
+        "isMiss": true,
+        "isShow": true,
+        "isAlertMiss": false,
+      });
     }
 
     if (task["typeAlarm"] == "Repeat") {
@@ -265,36 +285,28 @@ class _MyHomePageState extends State<MyHomePage> {
       }
     }
 
-    // Lệnh bật thông báo MISS
-    // Nếu waitTime < now => isShow = true
-    if (timeWaitNotification.isBefore(now)) {
-      if (task["typeAlarm"] == "One Time")
-        ref.child(path).child(task["key"]).update({"isShow": true});
-      else
-        ref
-            .child(path)
-            .child(task["key"])
-            .update({"isShow": true, "isAlertMiss": false});
-    }
-
     //Cập nhật lại ngày thông báo của loại thông báo lặp lại (Repeat)
-    if (task["typeAlarm"] == "Repeat" && task["isShow"] == true) {
+    if (task["typeAlarm"] == "Repeat" &&
+        task["isShow"] == false &&
+        task["isMiss"] == true) {
       // Reset sau khi thông báo bị MISS
       if (task["isAlertMiss"] == true) {
-        ref.child(path).child(task["key"]).update({
+        await ref.child(path).child(task["key"]).update({
           "dateTime": taskDateTime.toString(),
           "isShow": false,
           "isMiss": true,
-          "isAlertMiss": false
+          "isAlertMiss": false,
+          "isAlertRemind": false
         });
       } else
-      // Reset sau khi nhận được thông báo
-      if (task["isMiss"] == false) {
-        ref.child(path).child(task["key"]).update({
+      // Reset sau khi nhận được thông báo remind
+      if (task["isAlertRemind"] == true) {
+        await ref.child(path).child(task["key"]).update({
           "dateTime": taskDateTime.toString(),
           "isShow": false,
           "isMiss": true,
-          "isAlertMiss": false
+          "isAlertMiss": false,
+          "isAlertRemind": false
         });
       }
     }
@@ -303,22 +315,34 @@ class _MyHomePageState extends State<MyHomePage> {
   void alertStatusTask() {
     List<dynamic> listTaskMiss = [], listRemind = [];
 
-    listTask.forEach((element) {
+    listTask.forEach((element) async {
       // Thêm vào list Task bị MISS
       if (element["isMiss"] == true &&
           element["isShow"] == true &&
-          element["isAlertMiss"] == false &&
-          element["status"] == true) {
+          element["status"] == true &&
+          element["isAlertMiss"] == false) {
         listTaskMiss.add(element);
       }
 
       // Thêm vào list Task đã nhận được
-      if (element["isShow"] == false && element["isMiss"] == false) {
+      if (element["isMiss"] == false &&
+          element["isShow"] == true &&
+          element["status"] == true &&
+          element["isAlertRemind"] == false) {
         listRemind.add(element);
-        ref
-            .child(path)
-            .child(element["key"])
-            .update({"isShow": true, "status": false});
+        if (element["typeAlarm"] == "One Time") {
+          await ref.child(path).child(element["key"]).update({
+            "isShow": false,
+            "status": false,
+            "isMiss": true,
+            "isAlertRemind": true
+          });
+        } else if (element["typeAlarm"] == "Repeat") {
+          await ref
+              .child(path)
+              .child(element["key"])
+              .update({"isShow": false, "isMiss": true, "isAlertRemind": true});
+        }
       }
     });
     if (listTaskMiss.length != 0) {
@@ -545,11 +569,11 @@ class _MyHomePageState extends State<MyHomePage> {
     print("check dialog");
     var cron = new Cron();
     cron.schedule(new Schedule.parse('* * * * *'), () async {
-      listTask.forEach((element) {
-        if (element["status"] == true) checkIsShow(element);
-
-        alertStatusTask();
+      listTask.forEach((element) async {
+        if (element["status"] == true) await checkIsShow(element);
       });
+
+      alertStatusTask();
     });
   }
 }

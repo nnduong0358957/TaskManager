@@ -67,8 +67,8 @@ class _ListExpansionState extends State<ListExpansion> {
             // The current items in the list.
             items: widget.listTask,
             insertDuration: Duration(seconds: 1, milliseconds: 40),
-            removeDuration: Duration(milliseconds: 50),
-            updateDuration: Duration(seconds: 0),
+            removeDuration: Duration(seconds: 1),
+            updateDuration: Duration(seconds: 5),
             areItemsTheSame: (a, b) => a["key"] == b["key"],
             itemBuilder: (context, animation, item, index) {
               return SlideTransition(

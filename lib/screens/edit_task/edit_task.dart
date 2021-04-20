@@ -372,7 +372,8 @@ class _EditPageState extends State<EditPage> {
         "tags": newTask.tags,
         "isMiss": true,
         "isShow": false,
-        "isAlertMiss": false
+        "isAlertMiss": false,
+        "isAlertRemind": false,
       });
 
       Navigator.pop(context);

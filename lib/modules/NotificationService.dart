@@ -30,21 +30,7 @@ class NotificationService extends ChangeNotifier {
             android: initializationSettingsAndroid,
             iOS: initializationSettingsIOS);
 
-    await _flutterLocalNotificationsPlugin.initialize(initializationSettings,
-        onSelectNotification: (String payload) async {
-      Map<String, dynamic> task;
-
-      if (payload != null) {
-        print("Notification paylpoad: $payload");
-        listTask.forEach((element) {
-          if (element["key"] == payload) {
-            task = element;
-          }
-        });
-
-        clickOnNotification(task["key"]);
-      }
-    });
+    await _flutterLocalNotificationsPlugin.initialize(initializationSettings);
   }
 
   Future instantNotification(Map<String, dynamic> task, int id) async {
@@ -117,11 +103,5 @@ class NotificationService extends ChangeNotifier {
   // Cancel notification
   Future cancelNotification() async {
     await _flutterLocalNotificationsPlugin.cancelAll();
-  }
-
-  Future clickOnNotification(String key) async {
-    final path = "users/${auth.currentUser.uid}/tasks";
-
-    await ref.child(path).child(key).update({"isMiss": false, "isShow": false});
   }
 }

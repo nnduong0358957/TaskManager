@@ -14,6 +14,7 @@ class Task {
   bool isMiss;
   bool isShow;
   bool isAlertMiss;
+  bool isAlertRemind;
 
   Task(
       {@required this.title,
@@ -28,7 +29,8 @@ class Task {
       this.tags,
       this.isMiss = true,
       this.isShow = false,
-      this.isAlertMiss = false});
+      this.isAlertMiss = false,
+      this.isAlertRemind = false});
 
   static List<String> listTag = [
     "Priority",

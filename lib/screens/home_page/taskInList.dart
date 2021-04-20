@@ -238,15 +238,15 @@ class _TaskInListState extends State<TaskInList> {
     // Nếu bật lại task thuộc loại OneTime thì đặt cho nó thời gian trước thời
     // gian bây giờ để tránh bị lỗi (thời gian thông báo ở quá khứ)
     if (newValue && task["typeAlarm"] == "One Time") {
-      DateTime newDate = DateTime(
+      DateTime newDateTime = DateTime(
           now.year, now.month, now.day, taskDateTime.hour, taskDateTime.minute);
-      if (newDate.isBefore(now)) {
-        newDate = newDate.add(Duration(days: 1));
+      if (newDateTime.isBefore(now)) {
+        newDateTime = newDateTime.add(Duration(days: 1));
       }
       await ref
           .child(path)
           .child(task["key"])
-          .update({"dateTime": newDate.toString()});
+          .update({"dateTime": newDateTime.toString()});
     }
 
     await ref.child(path).child(task["key"]).update({"status": newValue});

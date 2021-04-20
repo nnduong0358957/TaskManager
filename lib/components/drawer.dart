@@ -80,7 +80,7 @@ class _AppDrawerState extends State<AppDrawer> {
                 size: 30,
               ),
               title: Text(
-                'Reset Account',
+                'Reset Password',
               ),
               onTap: () {
                 widget.auth.sendPasswordResetEmail(email: currentUser.email);

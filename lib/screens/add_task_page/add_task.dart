@@ -286,7 +286,8 @@ class _AddPageState extends State<AddPage> {
         "tags": newTask.tags,
         "isMiss": newTask.isMiss,
         "isShow": newTask.isShow,
-        "isAlertMiss": newTask.isAlertMiss
+        "isAlertMiss": newTask.isAlertMiss,
+        "isAlertRemind": newTask.isAlertRemind
       });
 
       Navigator.pop(context);

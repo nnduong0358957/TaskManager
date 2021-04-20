@@ -75,28 +75,29 @@ class _FindByTagsState extends State<FindByTags> {
             ),
           ),
           // Specify the generic type of the data in the list.
+          // Specify the generic type of the data in the list.
           ImplicitlyAnimatedList<dynamic>(
             shrinkWrap: true,
             physics: NeverScrollableScrollPhysics(),
             // The current items in the list.
-            items: widget.listTask,
-            // Called by the DiffUtil to decide whether two object represent the same item.
-            // For example, if your items have unique ids, this method should check their id equality.
+            items: _listTaskFound,
+            insertDuration: Duration(seconds: 1, milliseconds: 40),
+            removeDuration: Duration(seconds: 1),
+            updateDuration: Duration(seconds: 5),
             areItemsTheSame: (a, b) => a["key"] == b["key"],
-            // Called, as needed, to build list item widgets.
-            // List items are only built when they're scrolled into view.
             itemBuilder: (context, animation, item, index) {
-              // Specifiy a transition to be used by the ImplicitlyAnimatedList.
-              // See the Transitions section on how to import this transition.
               return SlideTransition(
                   position: animation.drive(
                       Tween<Offset>(begin: Offset(1, 0), end: Offset(0, 0))
                           .chain(CurveTween(curve: Curves.easeInOutBack))),
-                  child: TaskInList(task: widget.listTask[index]));
+                  child: TaskInList(task: _listTaskFound[index]));
+              // return SizeFadeTransition(
+              //   sizeFraction: 0.7,
+              //   curve: Curves.easeInOut,
+              //   animation: animation,
+              //   child: TaskInList(task: widget.listTask[index])
+              // );
             },
-            // An optional builder when an item was removed from the list.
-            // If not specified, the List uses the itemBuilder with
-            // the animation reversed.
             removeItemBuilder: (context, animation, oldItem) {
               return FadeTransition(
                   opacity: animation, child: TaskInList(task: oldItem));
@@ -124,7 +125,7 @@ class _FindByTagsState extends State<FindByTags> {
           var setListTag = tags.toSet();
 
           List<dynamic> result =
-          setListSelectedTag.intersection(setListTag).toList();
+              setListSelectedTag.intersection(setListTag).toList();
           if (eq(result, _listSelectedTag)) _listTaskFound.add(task);
         }
       });

@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 
 const kPrimaryColor = Colors.blue;
 const kTextColor = Colors.white;
+DateTime kNow = DateTime.now();
+DateTime kTomorrow = kNow.add(Duration(days: 1));
+DateTime kYesterday = kNow.subtract(Duration(days: 1));
+
 
 Container buildColorGradient() {
   return Container(
