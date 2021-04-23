@@ -1,21 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:implicitly_animated_reorderable_list/implicitly_animated_reorderable_list.dart';
 import 'package:multi_select_flutter/multi_select_flutter.dart';
+import 'package:todo_list_app/components/type_of_work/dialogTypeOfWork.dart';
 import 'package:todo_list_app/modules/task.dart';
 import 'package:todo_list_app/screens/home_page/taskInList.dart';
 import 'package:collection/collection.dart';
 
 class FindByTags extends StatefulWidget {
-  FindByTags({this.listTask});
+  FindByTags({this.listTask, this.typeOfWork, this.refreshPage});
 
-  final List<dynamic> listTask;
+  final List<dynamic> listTask, typeOfWork;
+  final VoidCallback refreshPage;
 
   @override
   _FindByTagsState createState() => _FindByTagsState();
 }
 
 class _FindByTagsState extends State<FindByTags> {
-  final _tags = Task.listTag.map((e) => MultiSelectItem<String>(e, e)).toList();
   List<dynamic> _listSelectedTag = [];
   List<dynamic> _listTaskFound = [];
 
@@ -23,6 +24,9 @@ class _FindByTagsState extends State<FindByTags> {
 
   @override
   Widget build(BuildContext context) {
+    final _tags =
+        widget.typeOfWork.map((e) => MultiSelectItem<String>(e, e)).toList();
+
     setList();
     return SingleChildScrollView(
       child: Column(
@@ -74,6 +78,18 @@ class _FindByTagsState extends State<FindByTags> {
               ),
             ),
           ),
+          Padding(
+            padding: const EdgeInsets.only(right: 16.0),
+            child: Align(
+              alignment: Alignment.bottomRight,
+              child: DialogTypeOfWork(
+                  typeOfWork: widget.typeOfWork,
+                  refreshPage: widget.refreshPage),
+            ),
+          ),
+          SizedBox(
+            height: 20,
+          ),
           // Specify the generic type of the data in the list.
           // Specify the generic type of the data in the list.
           ImplicitlyAnimatedList<dynamic>(
@@ -81,9 +97,9 @@ class _FindByTagsState extends State<FindByTags> {
             physics: NeverScrollableScrollPhysics(),
             // The current items in the list.
             items: _listTaskFound,
-            insertDuration: Duration(seconds: 1, milliseconds: 40),
-            removeDuration: Duration(seconds: 1),
-            updateDuration: Duration(seconds: 5),
+            insertDuration: Duration(seconds: 1),
+            removeDuration: Duration(milliseconds: 70),
+            updateDuration: Duration(seconds: 1),
             areItemsTheSame: (a, b) => a["key"] == b["key"],
             itemBuilder: (context, animation, item, index) {
               return SlideTransition(
@@ -91,12 +107,6 @@ class _FindByTagsState extends State<FindByTags> {
                       Tween<Offset>(begin: Offset(1, 0), end: Offset(0, 0))
                           .chain(CurveTween(curve: Curves.easeInOutBack))),
                   child: TaskInList(task: _listTaskFound[index]));
-              // return SizeFadeTransition(
-              //   sizeFraction: 0.7,
-              //   curve: Curves.easeInOut,
-              //   animation: animation,
-              //   child: TaskInList(task: widget.listTask[index])
-              // );
             },
             removeItemBuilder: (context, animation, oldItem) {
               return FadeTransition(

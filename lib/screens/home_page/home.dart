@@ -10,7 +10,7 @@ import 'package:todo_list_app/components/drawer.dart';
 import 'package:todo_list_app/constants.dart';
 import 'package:todo_list_app/screens/add_task_page/add_task.dart';
 import 'package:todo_list_app/components/color_loader_2.dart';
-import 'package:todo_list_app/screens/home_page/calendar/events_calendar.dart';
+import 'package:todo_list_app/screens/home_page/events_calendar.dart';
 import 'package:todo_list_app/screens/home_page/findByTags.dart';
 import 'package:todo_list_app/screens/home_page/list_expansion.dart';
 import 'package:todo_list_app/modules/NotificationService.dart';
@@ -34,6 +34,7 @@ class _MyHomePageState extends State<MyHomePage> {
   String isDone;
   String path;
   List<dynamic> listTask = [];
+  List<dynamic> typeOfWork = [];
   final Map<String, dynamic> listCategory = {
     "Today": [],
     "Tomorrow": [],
@@ -97,8 +98,8 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                 ),
                 floatingActionButton: Container(
-                  width: 100,
-                  height: 100,
+                  width: 80,
+                  height: 80,
                   child: FloatingActionButton(
                     onPressed: () {
                       Navigator.of(context).push(_createRoute());
@@ -117,10 +118,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       children: [
                         Container(
                             height: MediaQuery.of(context).size.height,
-                            child: TableEvents(listTask: listTask)),
-                        SizedBox(
-                          height: 200,
-                        ),
+                            child: TableCalendarWithEvents(listTask: listTask)),
                       ],
                     )),
                     SingleChildScrollView(
@@ -156,7 +154,10 @@ class _MyHomePageState extends State<MyHomePage> {
                         ],
                       ),
                     ),
-                    FindByTags(listTask: listTask),
+                    FindByTags(
+                        listTask: listTask,
+                        typeOfWork: typeOfWork,
+                        refreshPage: refreshPage),
                   ],
                 )),
           ));
@@ -179,6 +180,18 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future loadData() async {
     ref = FirebaseDatabase.instance.reference();
+
+    await ref
+        .child("users/${widget.auth.currentUser.uid}/typeOfWork")
+        .onValue
+        .listen((event) {
+      var dataSnapshot = event.snapshot;
+      List<dynamic> values = dataSnapshot.value;
+      if (values != null) {
+        typeOfWork = values;
+      } else
+        initialTypeOfWork();
+    });
 
     await ref.child(path).onValue.listen((event) {
       print("Read data to list");
@@ -203,6 +216,8 @@ class _MyHomePageState extends State<MyHomePage> {
             "typeAlarm": value["typeAlarm"],
             "dateTime": value["dateTime"],
             "typeRepeat": value["typeRepeat"],
+            "periodTime": value["periodTime"],
+            "timeUnit": value["timeUnit"],
             "subTasks": value["subTasks"],
             "status": value["status"],
             "isDone": value["isDone"],
@@ -246,25 +261,14 @@ class _MyHomePageState extends State<MyHomePage> {
     DateTime taskDateTime = DateTime.parse(task["dateTime"]);
     DateTime timeWaitNotification = taskDateTime.add(Duration(minutes: 5));
 
-    // Nếu bật app lên trong thời gian chờ xác nhận thông báo thì hiển thị
-    // dialog báo có công việc ngay bây giờ
+    // Nếu bật app lên trong thời gian chờ xác nhận thông báo thì isMiss = false, isShow = true
     if (timeWaitNotification.isAfter(now) &&
         now.isAfter(taskDateTime) &&
         task["isAlertRemind"] == false) {
       await ref
           .child(path)
           .child(task["key"])
-          .update({"isMiss": false, "isShow": true, "isAlertRemind": false});
-    }
-
-    // Lệnh bật thông báo MISS
-    // Nếu waitTime < now => isShow = true
-    if (timeWaitNotification.isBefore(now) && task["isAlertMiss"] == false) {
-      await ref.child(path).child(task["key"]).update({
-        "isMiss": true,
-        "isShow": true,
-        "isAlertMiss": false,
-      });
+          .update({"isMiss": false, "isShow": true});
     }
 
     if (task["typeAlarm"] == "Repeat") {
@@ -275,14 +279,36 @@ class _MyHomePageState extends State<MyHomePage> {
             taskDateTime = taskDateTime.add(Duration(days: 1));
           });
         }
-      } else {
+      } else if (task["typeRepeat"] == "Weekly") {
         while (now.isAfter(taskDateTime)) {
           // Đưa task date đến ngày thông báo gần nhất
           setState(() {
             taskDateTime = taskDateTime.add(Duration(days: 7));
           });
         }
+      } else if (task["typeRepeat"] == "Period") {
+        while (now.isAfter(taskDateTime)) {
+          // Đưa task date đến ngày thông báo gần nhất
+          if (task["timeUnit"] == "Minutes") {
+            taskDateTime =
+                taskDateTime.add(Duration(minutes: task["periodTime"]));
+          } else if (task["timeUnit"] == "Hours") {
+            taskDateTime =
+                taskDateTime.add(Duration(hours: task["periodTime"]));
+          } else if (task["timeUnit"] == "Days") {
+            taskDateTime = taskDateTime.add(Duration(days: task["periodTime"]));
+          }
+        }
       }
+    }
+
+    // Nếu waitTime < now => isShow = true
+    if (timeWaitNotification.isBefore(now) && task["isAlertMiss"] == false) {
+      await ref.child(path).child(task["key"]).update({
+        "isMiss": true,
+        "isShow": true,
+        "isAlertMiss": false,
+      });
     }
 
     //Cập nhật lại ngày thông báo của loại thông báo lặp lại (Repeat)
@@ -370,7 +396,9 @@ class _MyHomePageState extends State<MyHomePage> {
 //Animation for Navigator
   Route _createRoute() {
     return PageRouteBuilder(
-      pageBuilder: (context, animation, secondaryAnimation) => AddPage(),
+      pageBuilder: (context, animation, secondaryAnimation) => AddPage(
+        typeOfWork: typeOfWork,
+      ),
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
         var begin = Offset(0.0, 1.0);
         var end = Offset.zero;
@@ -451,6 +479,7 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Image.asset("assets/images/reminder.png"),
       ),
       content: Text(content),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       actions: [
         FlatButton(onPressed: () => Navigator.pop(context), child: Text('Ok'))
       ],
@@ -528,6 +557,8 @@ class _MyHomePageState extends State<MyHomePage> {
               )
             ],
           ),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           actions: <Widget>[
             new OutlineButton(
               shape: new RoundedRectangleBorder(
@@ -575,5 +606,19 @@ class _MyHomePageState extends State<MyHomePage> {
 
       alertStatusTask();
     });
+  }
+
+  Future initialTypeOfWork() async {
+    List<String> listTag = [
+      "Priority",
+      "Important",
+      "Deadline",
+      "Family",
+      "Work",
+      "In Progress"
+    ];
+    await ref
+        .child("users/${widget.auth.currentUser.uid}/typeOfWork")
+        .set(listTag);
   }
 }

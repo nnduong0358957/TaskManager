@@ -249,7 +249,13 @@ class _TaskInListState extends State<TaskInList> {
           .update({"dateTime": newDateTime.toString()});
     }
 
-    await ref.child(path).child(task["key"]).update({"status": newValue});
+    await ref.child(path).child(task["key"]).update({
+      "status": newValue,
+      "isMiss": true,
+      "isShow": false,
+      "isAlertMiss": false,
+      "isAlertRemind": false
+    });
   }
 
   Future checkDone(Map<String, dynamic> task) async {

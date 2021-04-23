@@ -12,6 +12,10 @@ import 'package:lite_rolling_switch/lite_rolling_switch.dart';
 import 'package:todo_list_app/modules/task.dart';
 
 class AddPage extends StatefulWidget {
+  AddPage({this.typeOfWork});
+
+  final List<dynamic> typeOfWork;
+
   @override
   _AddPageState createState() => _AddPageState();
 }
@@ -30,6 +34,8 @@ class _AddPageState extends State<AddPage> {
   String selectedDateTimeString;
   DateTime _selectedDate;
   TimeOfDay _selectedTime;
+  int periodTime = 1;
+  String timeUnit = "Minutes";
   List<String> listSubTask = List<String>();
   List<String> listNameOfDay = [
     "Monday",
@@ -45,11 +51,13 @@ class _AddPageState extends State<AddPage> {
 
   final FirebaseAuth auth = FirebaseAuth.instance;
 
-  final _tags = Task.listTag.map((e) => MultiSelectItem<String>(e, e)).toList();
   List<dynamic> _listSelectedTag = [];
 
   @override
   Widget build(BuildContext context) {
+    final _tags =
+        widget.typeOfWork.map((e) => MultiSelectItem<String>(e, e)).toList();
+
     return MaterialApp(
       theme: ThemeData(
         primaryColor: kPrimaryColor,
@@ -110,43 +118,41 @@ class _AddPageState extends State<AddPage> {
                       child: buildTextField("Task name",
                           "Please enter Task Name", titleTaskController, false),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 20.0),
-                      child: MultiSelectDialogField(
-                        items: _tags,
-                        title: Text("Tags"),
-                        selectedColor: Colors.blue,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.all(Radius.circular(40)),
-                          border: Border.all(
-                            color: Colors.blue,
-                            width: 2,
-                          ),
-                        ),
-                        buttonIcon: Icon(
-                          null,
-                          color: Colors.blue,
-                        ),
-                        buttonText: Text(
-                          "Select tags",
-                          style: TextStyle(
-                            fontSize: 14,
-                          ),
-                        ),
-                        onConfirm: (results) {
-                          _listSelectedTag = results;
-                        },
-                        chipDisplay: MultiSelectChipDisplay(
-                          onTap: (value) {
-                            setState(() {
-                              _listSelectedTag.remove(value);
-                            });
-                          },
+                    MultiSelectDialogField(
+                      items: _tags,
+                      title: Text("Type of work"),
+                      barrierColor: Colors.black54,
+                      searchable: true,
+                      selectedColor: Colors.blue,
+                      buttonIcon: Icon(Icons.work),
+                      buttonText: Text(
+                        "Select type of work",
+                        style: TextStyle(
+                          fontSize: 14,
                         ),
                       ),
+                      onConfirm: (results) {
+                        _listSelectedTag = results;
+                      },
+                      chipDisplay: MultiSelectChipDisplay(
+                        onTap: (value) {
+                          setState(() {
+                            _listSelectedTag.remove(value);
+                          });
+                        },
+                      ),
                     ),
-                    buildTextField("Content", "Please enter content of task",
-                        contentController, false),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 30),
+                      child: buildTextField(
+                          "Content",
+                          "Please enter content of task",
+                          contentController,
+                          false),
+                    ),
                     Padding(
                       padding: const EdgeInsets.only(bottom: 20.0, top: 30),
                       child: Row(
@@ -195,9 +201,14 @@ class _AddPageState extends State<AddPage> {
                         status: status,
                         changeStatus: _changeStatus),
                     SelectType(
-                        selectedType: _selectedType,
-                        selectedRepeat: _selectedRepeat,
-                        typeRepeat: _typeRepeat),
+                      selectedType: _selectedType,
+                      selectedRepeat: _selectedRepeat,
+                      typeRepeat: _typeRepeat,
+                      periodTime: periodTime,
+                      timeUnit: timeUnit,
+                      changePeriodTime: changePeriodTime,
+                      changeTimeUnit: changeTimeUnit,
+                    ),
                     Row(
                       children: [
                         Text(
@@ -264,14 +275,17 @@ class _AddPageState extends State<AddPage> {
 
     if (finalDateTime.isAfter(DateTime.now())) {
       newTask = Task(
-          title: titleTaskController.text,
-          content: contentController.text,
-          typeAlarm: _selectedType,
-          dateTime: finalDateTime,
-          status: status,
-          typeRepeat: _typeRepeat,
-          subTasks: listSubTask,
-          tags: _listSelectedTag);
+        title: titleTaskController.text,
+        content: contentController.text,
+        typeAlarm: _selectedType,
+        dateTime: finalDateTime,
+        status: status,
+        typeRepeat: _typeRepeat,
+        subTasks: listSubTask,
+        tags: _listSelectedTag,
+        periodTime: periodTime,
+        timeUnit: timeUnit,
+      );
 
       ref.child(path).push().set({
         "title": newTask.title,
@@ -279,6 +293,8 @@ class _AddPageState extends State<AddPage> {
         "typeAlarm": newTask.typeAlarm,
         "dateTime": newTask.dateTime.toString(),
         "typeRepeat": newTask.typeRepeat,
+        "periodTime": newTask.periodTime,
+        "timeUnit": newTask.timeUnit,
         "subTasks": newTask.subTasks,
         "status": newTask.status,
         "isDeleted": newTask.isDeleted,
@@ -398,6 +414,10 @@ class _AddPageState extends State<AddPage> {
       setState(() {
         _typeRepeat = "Weekly";
       });
+    else if (val == "Period")
+      setState(() {
+        _typeRepeat = "Period";
+      });
 
     if (selectedDateTimeString != null)
       setState(() {
@@ -433,6 +453,8 @@ class _AddPageState extends State<AddPage> {
         return "Once a day at ${selectedTime.hour}:$minute";
       else if (_typeRepeat == "Weekly")
         return "Once a week on $nameOfDayOfWeek at ${selectedTime.hour}:$minute";
+      else if (_typeRepeat == "Period")
+        return "Repeat every 3 minutes from $nameOfDayOfWeek at ${selectedTime.hour}:$minute";
     }
   }
 
@@ -464,6 +486,7 @@ class _AddPageState extends State<AddPage> {
       ),
       content: Text(content),
       elevation: 24,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       actions: [
         Row(
           children: [
@@ -503,6 +526,7 @@ class _AddPageState extends State<AddPage> {
         style: TextStyle(color: Colors.red, fontSize: 18),
       ),
       elevation: 24,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       actions: [
         Row(
           children: [
@@ -542,5 +566,17 @@ class _AddPageState extends State<AddPage> {
       context: context,
       builder: (context) => alertDialog,
     );
+  }
+
+  void changeTimeUnit(newUnit) {
+    setState(() {
+      timeUnit = newUnit;
+    });
+  }
+
+  void changePeriodTime(newTime) {
+    setState(() {
+      periodTime = newTime;
+    });
   }
 }

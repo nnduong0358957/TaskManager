@@ -391,6 +391,8 @@ class _MyLoginPageState extends State<MyLoginPage> {
         content,
         style: TextStyle(color: Colors.red, fontSize: 18),
       ),
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20)),
       actions: [
         FlatButton(onPressed: () => Navigator.pop(context), child: Text('Ok'))
       ],

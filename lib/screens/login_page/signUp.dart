@@ -64,6 +64,8 @@ class _SignUpPageState extends State<SignUpPage> {
         content,
         style: TextStyle(color: Colors.red),
       ),
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20)),
       actions: [
         FlatButton(onPressed: () => Navigator.pop(context), child: Text('Ok'))
       ],

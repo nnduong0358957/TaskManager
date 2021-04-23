@@ -5,16 +5,16 @@ import 'package:table_calendar/table_calendar.dart';
 import 'package:todo_list_app/constants.dart';
 import 'package:todo_list_app/screens/home_page/taskInList.dart';
 
-class TableEvents extends StatefulWidget {
-  TableEvents({this.listTask});
+class TableCalendarWithEvents extends StatefulWidget {
+  TableCalendarWithEvents({this.listTask});
 
   final List<dynamic> listTask;
 
   @override
-  _TableEventsState createState() => _TableEventsState();
+  _TableCalendarWithEventsState createState() => _TableCalendarWithEventsState();
 }
 
-class _TableEventsState extends State<TableEvents> {
+class _TableCalendarWithEventsState extends State<TableCalendarWithEvents> {
   Map<DateTime, List<dynamic>> eventSource;
   Map<DateTime, List<dynamic>> events;
   ValueNotifier<List<dynamic>> _selectedEvents;
@@ -41,48 +41,56 @@ class _TableEventsState extends State<TableEvents> {
   @override
   Widget build(BuildContext context) {
     initial();
-    return Column(
-      children: [
-        TableCalendar(
-          firstDay: kNow,
-          lastDay: DateTime(
-              kNow.year + 2, kNow.month, kNow.day, kNow.hour, kNow.minute),
-          focusedDay: _focusedDay,
-          calendarStyle: CalendarStyle(
-              weekendTextStyle: TextStyle(color: Colors.green),
-              defaultTextStyle: TextStyle(color: kPrimaryColor)),
-          selectedDayPredicate: (day) {
-            return isSameDay(_selectedDay, day);
-          },
-          onDaySelected: _onDaySelected,
-          calendarFormat: _calendarFormat,
-          onFormatChanged: (format) {
-            setState(() {
-              _calendarFormat = format;
-            });
-          },
-          onPageChanged: (focusedDay) {
-            _focusedDay = focusedDay;
-          },
-          eventLoader: (day) {
-            return _getEventsForDay(day);
-          },
-        ),
-        const SizedBox(height: 8.0),
-        Expanded(
-          child: ValueListenableBuilder<List<dynamic>>(
-            valueListenable: _selectedEvents,
-            builder: (context, value, _) {
-              return ListView.builder(
-                itemCount: value.length,
-                itemBuilder: (context, index) {
-                  return buildTaskInList(value[index]);
+    return SingleChildScrollView(
+      child: Container(
+        height: MediaQuery.of(context).size.height + 200,
+        child: Column(
+          children: [
+            TableCalendar(
+              firstDay: kNow,
+              lastDay: DateTime(
+                  kNow.year + 2, kNow.month, kNow.day, kNow.hour, kNow.minute),
+              focusedDay: _focusedDay,
+              calendarStyle: CalendarStyle(
+                  weekendTextStyle: TextStyle(color: Colors.red),
+                  defaultTextStyle: TextStyle(color: kPrimaryColor)),
+              selectedDayPredicate: (day) {
+                return isSameDay(_selectedDay, day);
+              },
+              onDaySelected: _onDaySelected,
+              calendarFormat: _calendarFormat,
+              onFormatChanged: (format) {
+                setState(() {
+                  _calendarFormat = format;
+                });
+              },
+              onPageChanged: (focusedDay) {
+                _focusedDay = focusedDay;
+              },
+              eventLoader: (day) {
+                return _getEventsForDay(day);
+              },
+            ),
+            const SizedBox(height: 8.0),
+            Expanded(
+              child: ValueListenableBuilder<List<dynamic>>(
+                valueListenable: _selectedEvents,
+                builder: (context, value, _) {
+                  return ListView.builder(
+                    itemCount: value.length,
+                    itemBuilder: (context, index) {
+                      return buildTaskInList(value[index]);
+                    },
+                  );
                 },
-              );
-            },
-          ),
+              ),
+            ),
+            SizedBox(
+              height: 200,
+            ),
+          ],
         ),
-      ],
+      ),
     );
   }
 

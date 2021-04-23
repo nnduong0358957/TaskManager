@@ -66,9 +66,9 @@ class _ListExpansionState extends State<ListExpansion> {
             physics: NeverScrollableScrollPhysics(),
             // The current items in the list.
             items: widget.listTask,
-            insertDuration: Duration(seconds: 1, milliseconds: 40),
-            removeDuration: Duration(seconds: 1),
-            updateDuration: Duration(seconds: 5),
+            insertDuration: Duration(seconds: 1),
+            removeDuration: Duration(milliseconds: 70),
+            updateDuration: Duration(seconds: 1),
             areItemsTheSame: (a, b) => a["key"] == b["key"],
             itemBuilder: (context, animation, item, index) {
               return SlideTransition(
@@ -76,12 +76,6 @@ class _ListExpansionState extends State<ListExpansion> {
                       Tween<Offset>(begin: Offset(1, 0), end: Offset(0, 0))
                           .chain(CurveTween(curve: Curves.easeInOutBack))),
                   child: TaskInList(task: widget.listTask[index]));
-              // return SizeFadeTransition(
-              //   sizeFraction: 0.7,
-              //   curve: Curves.easeInOut,
-              //   animation: animation,
-              //   child: TaskInList(task: widget.listTask[index])
-              // );
             },
             removeItemBuilder: (context, animation, oldItem) {
               return FadeTransition(

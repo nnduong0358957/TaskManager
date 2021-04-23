@@ -3,6 +3,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:multi_select_flutter/multi_select_flutter.dart';
+import 'package:todo_list_app/components/color_loader_2.dart';
 import 'package:todo_list_app/constants.dart';
 import 'package:todo_list_app/screens/add_task_page/TypeSelect.dart';
 import 'package:todo_list_app/screens/add_task_page/list_subtasks.dart';
@@ -30,11 +31,13 @@ class _EditPageState extends State<EditPage> {
   TextEditingController contentController = TextEditingController();
   TextEditingController subTaskController = TextEditingController();
 
-  bool refreshPage = true;
+  bool refreshPage = true, isRead = false;
   bool status = true;
   String selectedDateTimeString;
   DateTime _selectedDate;
   TimeOfDay _selectedTime;
+  int periodTime = 1;
+  String timeUnit = "Minutes";
   List<String> listSubTask = List<String>();
   List<String> listNameOfDay = [
     "Monday",
@@ -52,8 +55,8 @@ class _EditPageState extends State<EditPage> {
 
   bool typeAlarmValue;
 
-  final _tags = Task.listTag.map((e) => MultiSelectItem<String>(e, e)).toList();
   List<dynamic> _listSelectedTag = [];
+  var _tags;
 
   @override
   void initState() {
@@ -91,240 +94,250 @@ class _EditPageState extends State<EditPage> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: ThemeData(
-        primaryColor: kPrimaryColor,
-      ),
-      home: SafeArea(
-        child: Scaffold(
-          appBar: AppBar(
-            leading: IconButton(
-              icon: Icon(Icons.arrow_back, size: 30),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
-            flexibleSpace: buildColorGradient(),
-            title: Text(
-              'Edit Task',
-              style: GoogleFonts.lato(
-                  fontSize: 30,
-                  fontWeight: FontWeight.w700,
-                  fontStyle: FontStyle.italic,
-                  color: kTextColor),
-            ),
-            actions: [
-              Padding(
-                padding: const EdgeInsets.only(right: 30),
-                child: Center(
-                  child: FlatButton(
-                    child: Text(
-                      'Save',
-                      style: GoogleFonts.lato(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w700,
-                          fontStyle: FontStyle.italic,
-                          color: kTextColor),
+    waitToRead();
+
+    if (isRead == true) {
+      return MaterialApp(
+        theme: ThemeData(
+          primaryColor: kPrimaryColor,
+        ),
+        home: SafeArea(
+          child: Scaffold(
+            appBar: AppBar(
+              leading: IconButton(
+                icon: Icon(Icons.arrow_back, size: 30),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+              flexibleSpace: buildColorGradient(),
+              title: Text(
+                'Edit Task',
+                style: GoogleFonts.lato(
+                    fontSize: 30,
+                    fontWeight: FontWeight.w700,
+                    fontStyle: FontStyle.italic,
+                    color: kTextColor),
+              ),
+              actions: [
+                Padding(
+                  padding: const EdgeInsets.only(right: 30),
+                  child: Center(
+                    child: FlatButton(
+                      child: Text(
+                        'Save',
+                        style: GoogleFonts.lato(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w700,
+                            fontStyle: FontStyle.italic,
+                            color: kTextColor),
+                      ),
+                      onPressed: () {
+                        checkData();
+                      },
                     ),
-                    onPressed: () {
-                      checkData();
-                    },
                   ),
-                ),
-              )
-            ],
-          ),
-          body: Container(
-            decoration: BoxDecoration(
-                image: DecorationImage(
-                    image: AssetImage("assets/images/bg_addTask.jpg"),
-                    fit: BoxFit.cover)),
-            child: SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.only(top: 20.0, right: 20, left: 20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(top: 10.0, bottom: 30),
-                      child: buildTextField("Task name",
-                          "Please enter Task Name", titleTaskController, false),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 20.0),
-                      child: MultiSelectDialogField(
-                        items: _tags,
-                        title: Text("Tags"),
-                        initialValue: _listSelectedTag,
-                        selectedColor: Colors.blue,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.all(Radius.circular(40)),
-                          border: Border.all(
+                )
+              ],
+            ),
+            body: Container(
+              decoration: BoxDecoration(
+                  image: DecorationImage(
+                      image: AssetImage("assets/images/bg_addTask.jpg"),
+                      fit: BoxFit.cover)),
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding:
+                      const EdgeInsets.only(top: 20.0, right: 20, left: 20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(top: 10.0, bottom: 30),
+                        child: buildTextField(
+                            "Task name",
+                            "Please enter Task Name",
+                            titleTaskController,
+                            false),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 20.0),
+                        child: MultiSelectDialogField(
+                          items: _tags,
+                          title: Text("Tags"),
+                          initialValue: _listSelectedTag,
+                          selectedColor: Colors.blue,
+                          buttonIcon: Icon(
+                            Icons.work,
                             color: Colors.blue,
-                            width: 2,
                           ),
-                        ),
-                        buttonIcon: Icon(
-                          null,
-                          color: Colors.blue,
-                        ),
-                        buttonText: Text(
-                          "Select tags",
-                          style: TextStyle(
-                            fontSize: 14,
+                          buttonText: Text(
+                            "Select tags",
+                            style: TextStyle(
+                              fontSize: 14,
+                            ),
                           ),
-                        ),
-                        onConfirm: (results) {
-                          _listSelectedTag = results;
-                        },
-                        chipDisplay: MultiSelectChipDisplay(
-                          onTap: (value) {
-                            setState(() {
-                              _listSelectedTag.remove(value);
-                            });
+                          onConfirm: (results) {
+                            _listSelectedTag = results;
                           },
+                          chipDisplay: MultiSelectChipDisplay(
+                            onTap: (value) {
+                              setState(() {
+                                _listSelectedTag.remove(value);
+                              });
+                            },
+                          ),
                         ),
                       ),
-                    ),
-                    buildTextField("Content", "Please enter content of task",
-                        contentController, false),
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 20.0, top: 30),
-                      child: Row(
+                      SizedBox(
+                        height: 10,
+                      ),
+                      buildTextField("Content", "Please enter content of task",
+                          contentController, false),
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 20.0, top: 30),
+                        child: Row(
+                          children: [
+                            Text(
+                              "One Time or Repeat:",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 16),
+                            ),
+                            Spacer(),
+                            Transform.scale(
+                              scale: 0.8,
+                              child: LiteRollingSwitch(
+                                //initial value
+                                value:
+                                    _selectedType == "One Time" ? false : true,
+                                textOn: 'Repeat',
+                                textOff: 'One',
+                                colorOn: Colors.greenAccent[700],
+                                colorOff: Colors.indigo,
+                                iconOn: Icons.replay,
+                                iconOff: Icons.adjust_outlined,
+                                textSize: 16.0,
+                                onChanged: (bool state) {
+                                  //Use it to manage the different states
+                                  if (state)
+                                    _ChangeSelectedType("Repeat");
+                                  else
+                                    _ChangeSelectedType("One Time");
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Text(
+                        "REMIND ME WHEN:",
+                        style: TextStyle(fontSize: 16),
+                      ),
+                      SetTimeButton(
+                          selectedDateTimeString: selectedDateTimeString,
+                          ChangeSelectedTime: _ChangeSelectedTime,
+                          selectTimeAlert: _selectTimeAlert),
+                      SelectedDateOnOff(
+                          selectedDateTimeString: selectedDateTimeString,
+                          selectTimeAlert: _selectTimeAlert,
+                          status: status,
+                          changeStatus: _changeStatus),
+                      SelectType(
+                          selectedType: _selectedType,
+                          selectedRepeat: _selectedRepeat,
+                          typeRepeat: _typeRepeat,
+                          periodTime: periodTime,
+                          timeUnit: timeUnit,
+                          changePeriodTime: changePeriodTime,
+                          changeTimeUnit: changeTimeUnit),
+                      Row(
                         children: [
                           Text(
-                            "One Time or Repeat:",
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 16),
+                            "SUBTASKS",
+                            style: TextStyle(fontSize: 17),
                           ),
                           Spacer(),
-                          Transform.scale(
-                            scale: 0.8,
-                            child: LiteRollingSwitch(
-                              //initial value
-                              value: _selectedType == "One Time" ? false : true,
-                              textOn: 'Repeat',
-                              textOff: 'One',
-                              colorOn: Colors.greenAccent[700],
-                              colorOff: Colors.indigo,
-                              iconOn: Icons.replay,
-                              iconOff: Icons.adjust_outlined,
-                              textSize: 16.0,
-                              onChanged: (bool state) {
-                                //Use it to manage the different states
-                                if (state)
-                                  _ChangeSelectedType("Repeat");
-                                else
-                                  _ChangeSelectedType("One Time");
-                              },
+                          RaisedButton(
+                            child: Row(
+                              children: [Icon(Icons.add), Text("New subtask")],
                             ),
+                            onPressed: () {
+                              if (subTaskController.text.trim() != "")
+                                listSubTask.add(subTaskController.text);
+                              else
+                                _showAlertDialog(context, "Error!!!",
+                                    "Please enter the SubTask name");
+                              subTaskController.text = "";
+                              _refreshPage();
+                            },
                           ),
                         ],
                       ),
-                    ),
-                    Text(
-                      "REMIND ME WHEN:",
-                      style: TextStyle(fontSize: 16),
-                    ),
-                    SetTimeButton(
-                        selectedDateTimeString: selectedDateTimeString,
-                        ChangeSelectedTime: _ChangeSelectedTime,
-                        selectTimeAlert: _selectTimeAlert),
-                    SelectedDateOnOff(
-                        selectedDateTimeString: selectedDateTimeString,
-                        selectTimeAlert: _selectTimeAlert,
-                        status: status,
-                        changeStatus: _changeStatus),
-                    SelectType(
-                        selectedType: _selectedType,
-                        selectedRepeat: _selectedRepeat,
-                        typeRepeat: _typeRepeat),
-                    Row(
-                      children: [
-                        Text(
-                          "SUBTASKS",
-                          style: TextStyle(fontSize: 17),
-                        ),
-                        Spacer(),
-                        RaisedButton(
-                          child: Row(
-                            children: [Icon(Icons.add), Text("New subtask")],
-                          ),
-                          onPressed: () {
-                            if (subTaskController.text.trim() != "")
-                              listSubTask.add(subTaskController.text);
-                            else
-                              _showAlertDialog(context, "Error!!!",
-                                  "Please enter the SubTask name");
-                            subTaskController.text = "";
-                            _refreshPage();
-                          },
-                        ),
-                      ],
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 10.0, bottom: 10),
-                      child: buildTextField("SubTask name", "Add a new subtask",
-                          subTaskController, false),
-                    ),
-                    ListSubTask(
-                        listSubTask: listSubTask,
-                        removeFromList: removeFromList),
-                    Row(
-                      children: [
-                        Expanded(
-                            child: OutlineButton(
-                          child: Padding(
-                            padding: const EdgeInsets.all(6.0),
-                            child: Text(
-                              'Add Task',
-                              style: GoogleFonts.lato(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w700,
-                                  fontStyle: FontStyle.italic,
-                                  color: Colors.red),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 10.0, bottom: 10),
+                        child: buildTextField("SubTask name",
+                            "Add a new subtask", subTaskController, false),
+                      ),
+                      ListSubTask(
+                          listSubTask: listSubTask,
+                          removeFromList: removeFromList),
+                      Row(
+                        children: [
+                          Expanded(
+                              child: OutlineButton(
+                            child: Padding(
+                              padding: const EdgeInsets.all(6.0),
+                              child: Text(
+                                'Add Task',
+                                style: GoogleFonts.lato(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w700,
+                                    fontStyle: FontStyle.italic,
+                                    color: Colors.red),
+                              ),
                             ),
+                            borderSide: BorderSide(color: Colors.red, width: 2),
+                            onPressed: () {
+                              _showDeleteTaskDialog(context);
+                            },
+                          )),
+                          SizedBox(
+                            width: 16,
                           ),
-                          borderSide: BorderSide(color: Colors.red, width: 2),
-                          onPressed: () {
-                            _showDeleteTaskDialog(context);
-                          },
-                        )),
-                        SizedBox(
-                          width: 16,
-                        ),
-                        Expanded(
-                            child: OutlineButton(
-                          child: Padding(
-                            padding: const EdgeInsets.all(6.0),
-                            child: Text(
-                              'Done',
-                              style: GoogleFonts.lato(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w700,
-                                  fontStyle: FontStyle.italic,
-                                  color: Colors.lightGreen),
+                          Expanded(
+                              child: OutlineButton(
+                            child: Padding(
+                              padding: const EdgeInsets.all(6.0),
+                              child: Text(
+                                'Done',
+                                style: GoogleFonts.lato(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w700,
+                                    fontStyle: FontStyle.italic,
+                                    color: Colors.lightGreen),
+                              ),
                             ),
-                          ),
-                          borderSide:
-                              BorderSide(color: Colors.lightGreen, width: 2),
-                          onPressed: () {
-                            doneTask();
-                          },
-                        )),
-                      ],
-                    ),
-                    SizedBox(
-                      height: 50,
-                    )
-                  ],
+                            borderSide:
+                                BorderSide(color: Colors.lightGreen, width: 2),
+                            onPressed: () {
+                              doneTask();
+                            },
+                          )),
+                        ],
+                      ),
+                      SizedBox(
+                        height: 50,
+                      )
+                    ],
+                  ),
                 ),
               ),
             ),
           ),
         ),
-      ),
-    );
+      );
+    }
+    return ColorLoader2();
   }
 
   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -352,14 +365,17 @@ class _EditPageState extends State<EditPage> {
 
     if (finalDateTime.isAfter(DateTime.now())) {
       newTask = Task(
-          title: titleTaskController.text,
-          content: contentController.text,
-          typeAlarm: _selectedType,
-          dateTime: finalDateTime,
-          status: status,
-          typeRepeat: _typeRepeat,
-          subTasks: listSubTask,
-          tags: _listSelectedTag);
+        title: titleTaskController.text,
+        content: contentController.text,
+        typeAlarm: _selectedType,
+        dateTime: finalDateTime,
+        status: status,
+        typeRepeat: _typeRepeat,
+        subTasks: listSubTask,
+        tags: _listSelectedTag,
+        periodTime: periodTime,
+        timeUnit: timeUnit,
+      );
 
       ref.child(path).update({
         "title": newTask.title,
@@ -367,6 +383,8 @@ class _EditPageState extends State<EditPage> {
         "typeAlarm": newTask.typeAlarm,
         "dateTime": newTask.dateTime.toString(),
         "typeRepeat": newTask.typeRepeat,
+        "periodTime": newTask.periodTime,
+        "timeUnit": newTask.timeUnit,
         "subTasks": newTask.subTasks,
         "status": newTask.status,
         "tags": newTask.tags,
@@ -394,6 +412,28 @@ class _EditPageState extends State<EditPage> {
     widget.homeRefresh();
   }
 
+  Future waitToRead() async {
+    await readTypeOfWork();
+    setState(() {
+      isRead = true;
+    });
+  }
+
+  Future readTypeOfWork() async {
+    final ref = FirebaseDatabase.instance.reference();
+
+    ref
+        .child("users/${auth.currentUser.uid}/typeOfWork")
+        .onValue
+        .listen((event) {
+      var dataSnapshot = event.snapshot;
+      List<dynamic> values = dataSnapshot.value;
+      if (values != null) {
+        _tags = values.map((e) => MultiSelectItem<String>(e, e)).toList();
+      }
+    });
+  }
+
   Future doneTask() async {
     String path =
         "users/${auth.currentUser.uid}/tasks/${widget.taskEdit['key']}";
@@ -408,7 +448,6 @@ class _EditPageState extends State<EditPage> {
     if (_selectedDate == null) {
       _selectedTime = null;
       selectedDateTimeString = null;
-      print("@@@@$_selectedDate");
       _showAlertDialog(context, "Error!!!", "You have not selected date");
       _refreshPage();
     } else {
@@ -495,6 +534,10 @@ class _EditPageState extends State<EditPage> {
       setState(() {
         _typeRepeat = "Weekly";
       });
+    else if (val == "Period")
+      setState(() {
+        _typeRepeat = "Period";
+      });
 
     if (selectedDateTimeString != null)
       setState(() {
@@ -530,6 +573,8 @@ class _EditPageState extends State<EditPage> {
         return "Once a day at ${selectedTime.hour}:$minute";
       else if (_typeRepeat == "Weekly")
         return "Once a week on $nameOfDayOfWeek at ${selectedTime.hour}:$minute";
+      else if (_typeRepeat == "Period")
+        return "Repeat every 3 minutes from $nameOfDayOfWeek at ${selectedTime.hour}:$minute";
     }
   }
 
@@ -561,6 +606,7 @@ class _EditPageState extends State<EditPage> {
       ),
       content: Text(content),
       elevation: 24,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       actions: [
         Row(
           children: [
@@ -599,6 +645,7 @@ class _EditPageState extends State<EditPage> {
         content,
         style: TextStyle(color: Colors.red, fontSize: 18),
       ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       elevation: 24,
       actions: [
         Row(
@@ -651,6 +698,7 @@ class _EditPageState extends State<EditPage> {
       content: Text("Are you sure to delete this task?",
           style: TextStyle(color: Colors.red, fontSize: 16)),
       elevation: 24,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       actions: [
         Row(
           children: [
@@ -691,5 +739,17 @@ class _EditPageState extends State<EditPage> {
       context: context,
       builder: (context) => alertDialog,
     );
+  }
+
+  void changeTimeUnit(newUnit) {
+    setState(() {
+      timeUnit = newUnit;
+    });
+  }
+
+  void changePeriodTime(newTime) {
+    setState(() {
+      periodTime = newTime;
+    });
   }
 }

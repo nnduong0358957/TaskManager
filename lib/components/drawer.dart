@@ -144,6 +144,7 @@ class _AppDrawerState extends State<AppDrawer> {
         style: TextStyle(color: Colors.red, fontSize: 18),
       ),
       elevation: 24,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       actions: [
         Row(
           children: [
@@ -189,6 +190,7 @@ class _AppDrawerState extends State<AppDrawer> {
     AlertDialog alertDialog = AlertDialog(
       content: Text(
           "An email will be sent to your email.\nPlease change the password there."),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       actions: [
         FlatButton(onPressed: () => Navigator.pop(context), child: Text('Ok'))
       ],

@@ -7,6 +7,8 @@ class Task {
   DateTime dateTime;
   bool status;
   String typeRepeat;
+  int periodTime;
+  String timeUnit;
   List<String> subTasks;
   bool isDeleted;
   bool isDone;
@@ -23,6 +25,8 @@ class Task {
       @required this.dateTime,
       this.status,
       this.typeRepeat,
+      this.periodTime,
+      this.timeUnit,
       this.subTasks,
       this.isDeleted = false,
       this.isDone = false,
@@ -31,13 +35,4 @@ class Task {
       this.isShow = false,
       this.isAlertMiss = false,
       this.isAlertRemind = false});
-
-  static List<String> listTag = [
-    "Priority",
-    "Important",
-    "Deadline",
-    "Family",
-    "Work",
-    "In Progress"
-  ];
 }
