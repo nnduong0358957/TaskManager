@@ -236,7 +236,7 @@ class _TaskInListState extends State<TaskInList> {
       await ref
           .child(path)
           .child(task["key"])
-          .update({"dateTime": newDateTime.toString()});
+          .update({"dateTime": newDateTime.toString(), "status": newValue});
     }
 
     await ref.child(path).child(task["key"]).update({

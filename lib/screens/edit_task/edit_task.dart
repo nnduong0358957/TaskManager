@@ -74,8 +74,10 @@ class _EditPageState extends State<EditPage> {
       _selectedType = "Repeat";
       _typeRepeat = widget.taskEdit["typeRepeat"];
 
-      periodTime = widget.taskEdit["periodTime"];
-      timeUnit = widget.taskEdit["timeUnit"];
+      if (widget.taskEdit["periodTime"] != null)
+        periodTime = widget.taskEdit["periodTime"];
+      if (widget.taskEdit["timeUnit"] != null)
+        timeUnit = widget.taskEdit["timeUnit"];
     }
 
     if (widget.taskEdit["subTasks"] != null) {
@@ -98,7 +100,6 @@ class _EditPageState extends State<EditPage> {
 
   @override
   Widget build(BuildContext context) {
-
     if (isRead == true) {
       return MaterialApp(
         theme: ThemeData(

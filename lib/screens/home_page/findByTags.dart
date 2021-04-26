@@ -98,7 +98,7 @@ class _FindByTagsState extends State<FindByTags> {
             // The current items in the list.
             items: _listTaskFound,
             insertDuration: Duration(seconds: 1),
-            removeDuration: Duration(milliseconds: 70),
+            removeDuration: Duration(seconds: 1),
             updateDuration: Duration(seconds: 1),
             areItemsTheSame: (a, b) => a["key"] == b["key"],
             itemBuilder: (context, animation, item, index) {

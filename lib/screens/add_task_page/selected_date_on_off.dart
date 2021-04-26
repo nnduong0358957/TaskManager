@@ -39,7 +39,7 @@ class _SelectedDateOnOffState extends State<SelectedDateOnOff> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Container(
-                  width: MediaQuery.of(context).size.width * 2 / 3,
+                  width: MediaQuery.of(context).size.width - 160,
                   child: Text(widget.selectedDateTimeString ?? "",
                       style: TextStyle(
                           color: widget.status ? Colors.blue : Colors.black)),
