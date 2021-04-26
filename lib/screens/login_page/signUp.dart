@@ -38,9 +38,8 @@ class _SignUpPageState extends State<SignUpPage> {
         setState(() {
           _error = 'Email already in use';
         });
-      }
-    } catch (e) {
-      print(e);
+      } else
+        print(e);
     }
 
     // True là báo thành công, false là báo thất bại
@@ -64,8 +63,7 @@ class _SignUpPageState extends State<SignUpPage> {
         content,
         style: TextStyle(color: Colors.red),
       ),
-      shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       actions: [
         FlatButton(onPressed: () => Navigator.pop(context), child: Text('Ok'))
       ],

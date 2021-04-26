@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:connectivity/connectivity.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -25,7 +26,8 @@ class _AppDrawerState extends State<AppDrawer> {
   TextEditingController displayNameController = TextEditingController();
   final picker = ImagePicker();
   File _imageFile;
-  String _imageUrl, _displayName, _oldPath;
+  String _imageUrl, _displayName;
+  bool isConnected = false;
 
   @override
   void initState() {
@@ -34,7 +36,6 @@ class _AppDrawerState extends State<AppDrawer> {
     displayNameController.text = widget.auth.currentUser.displayName;
     _imageUrl = widget.auth.currentUser.photoURL;
     _displayName = widget.auth.currentUser.displayName;
-    _oldPath = widget.auth.currentUser.photoURL;
   }
 
   @override
@@ -69,26 +70,15 @@ class _AppDrawerState extends State<AppDrawer> {
                   Align(
                     alignment: Alignment.topRight,
                     child: InkWell(
-                      onTap: () {
-                        _pickImageDialog(context);
+                      onTap: () async {
+                        await checkConnection(context);
+                        if (isConnected)
+                          _pickImageDialog(context);
+                        else
+                          _showDialogResetPass(
+                              context, "No network connection.");
                       },
-                      child: Container(
-                          width: 100.0,
-                          height: 100.0,
-                          decoration: new BoxDecoration(
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                  color: Colors.teal,
-                                  width: 1.0,
-                                  style: BorderStyle.solid),
-                              image: new DecorationImage(
-                                  fit: BoxFit.cover,
-                                  image: _imageFile != null
-                                      ? FileImage(_imageFile)
-                                      : _imageUrl != null
-                                          ? NetworkImage(_imageUrl)
-                                          : AssetImage(
-                                              "assets/images/defaultImage.png")))),
+                      child: buildContainerImage(100, 100),
                     ),
                   ),
                   Column(
@@ -127,7 +117,8 @@ class _AppDrawerState extends State<AppDrawer> {
               ),
               onTap: () {
                 widget.auth.sendPasswordResetEmail(email: currentUser.email);
-                _showDialogResetPass(context);
+                _showDialogResetPass(context,
+                    "An email will be sent to your email.\nPlease change the password there.");
               },
             ),
           ),
@@ -173,6 +164,32 @@ class _AppDrawerState extends State<AppDrawer> {
     );
   }
 
+  ClipRRect buildContainerImage(double imgWidth, double imgHeight) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(1000),
+      child: Container(
+        width: imgWidth,
+        height: imgHeight,
+        child: _imageUrl != null
+            ? Image.network(
+                _imageUrl,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                      alignment: Alignment.center,
+                      color: Colors.white,
+                      child: Image.asset(
+                        "assets/images/loadImgFailed.png",
+                        width: 40,
+                        height: 40,
+                      ));
+                },
+              )
+            : Image.asset("assets/images/defaultImage.png"),
+      ),
+    );
+  }
+
   Future pickImage() async {
     final pickedFile = await picker.getImage(source: ImageSource.gallery);
 
@@ -196,10 +213,6 @@ class _AppDrawerState extends State<AppDrawer> {
   }
 
   Future uploadFile() async {
-    if (_oldPath != null) {
-      deleteImgFile(_oldPath);
-    }
-
     if (_imageFile != null) {
       ref = firebase_storage.FirebaseStorage.instance
           .ref()
@@ -207,9 +220,12 @@ class _AppDrawerState extends State<AppDrawer> {
 
       await ref.putFile(_imageFile).whenComplete(() async {
         await ref.getDownloadURL().then((value) async {
+          deleteImgFile(_imageUrl);
+
           setState(() {
             _imageUrl = value;
           });
+
           await updateUserInfo(displayNameController.text.trim(), _imageUrl);
         });
       });
@@ -236,64 +252,12 @@ class _AppDrawerState extends State<AppDrawer> {
 
     if (url != null) {
       user.updateProfile(displayName: displayName, photoURL: url);
-
-      setState(() {
-        _oldPath = url;
-      });
     } else {
       user.updateProfile(displayName: displayName);
     }
 
     setState(() {
       _displayName = displayName;
-    });
-  }
-
-  TextField buildTextField(String labelText, String hintText,
-      TextEditingController controller, bool readOnly) {
-    return TextField(
-      controller: controller,
-      readOnly: readOnly,
-      maxLines: null, // để có thể nhập nhiều dòng trong TextField
-      decoration: InputDecoration(
-          labelText: labelText,
-          hintText: hintText,
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(5))),
-    );
-  }
-
-// Thông báo reset password
-  void _showDialogResetPass(BuildContext context) {
-    AlertDialog alertDialog = AlertDialog(
-      content: Text(
-          "An email will be sent to your email.\nPlease change the password there."),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      actions: [
-        FlatButton(onPressed: () => Navigator.pop(context), child: Text('Ok'))
-      ],
-    );
-    showDialog(
-      context: context,
-      builder: (context) => alertDialog,
-    );
-  }
-
-  Future _handleSignOut() async {
-    await widget.auth.signOut();
-    widget.onSignOut();
-  }
-
-  Future _handleDelete() async {
-    FirebaseAuth _auth = FirebaseAuth.instance;
-    await _auth.currentUser.delete().catchError((onError) {
-      print(onError);
-    });
-    widget.onSignOut();
-  }
-
-  void resetFileImg() {
-    setState(() {
-      _imageFile = null;
     });
   }
 
@@ -324,23 +288,7 @@ class _AppDrawerState extends State<AppDrawer> {
                           refresh = !refresh;
                         });
                       },
-                      child: Container(
-                          width: 200.0,
-                          height: 200.0,
-                          decoration: new BoxDecoration(
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                  color: Colors.teal,
-                                  width: 10.0,
-                                  style: BorderStyle.solid),
-                              image: new DecorationImage(
-                                  fit: BoxFit.cover,
-                                  image: _imageFile != null
-                                      ? FileImage(_imageFile)
-                                      : _imageUrl != null
-                                          ? NetworkImage(_imageUrl)
-                                          : AssetImage(
-                                              "assets/images/defaultImage.png")))),
+                      child: buildContainerImage(200, 200),
                     ),
                     SizedBox(height: 40),
                     buildTextField(
@@ -369,8 +317,8 @@ class _AppDrawerState extends State<AppDrawer> {
                     Padding(
                       padding: const EdgeInsets.only(left: 20.0),
                       child: OutlineButton(
-                        onPressed: () {
-                          uploadFile();
+                        onPressed: () async {
+                          await uploadFile();
                           Navigator.pop(context);
                         },
                         child: Padding(
@@ -391,6 +339,96 @@ class _AppDrawerState extends State<AppDrawer> {
           });
         });
   }
+
+  TextField buildTextField(String labelText, String hintText,
+      TextEditingController controller, bool readOnly) {
+    return TextField(
+      controller: controller,
+      readOnly: readOnly,
+      maxLines: null, // để có thể nhập nhiều dòng trong TextField
+      decoration: InputDecoration(
+          labelText: labelText,
+          hintText: hintText,
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(5))),
+    );
+  }
+
+// Thông báo reset password
+  void _showDialogResetPass(BuildContext context, String content) {
+    AlertDialog alertDialog = AlertDialog(
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SizedBox(
+            height: 20,
+          ),
+          Text(content),
+        ],
+      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      actions: [
+        FlatButton(onPressed: () => Navigator.pop(context), child: Text('Ok'))
+      ],
+    );
+    showDialog(
+      context: context,
+      builder: (context) => alertDialog,
+    );
+  }
+
+  Future _handleSignOut() async {
+    await widget.auth.signOut();
+    widget.onSignOut();
+  }
+
+  Future _handleDelete() async {
+    FirebaseAuth _auth = FirebaseAuth.instance;
+    await _auth.currentUser.delete().catchError((onError) {
+      print(onError);
+    });
+    widget.onSignOut();
+  }
+
+  void resetFileImg() {
+    setState(() {
+      _imageFile = null;
+    });
+  }
+
+  Future checkConnection(BuildContext context) async {
+    var connectivityResult = await (Connectivity().checkConnectivity());
+    if (connectivityResult == ConnectivityResult.mobile) {
+      print("Connect with wifi mobile");
+      setState(() {
+        isConnected = true;
+      });
+    } else if (connectivityResult == ConnectivityResult.wifi) {
+      print("Connect with wifi");
+      setState(() {
+        isConnected = true;
+      });
+    } else
+      setState(() {
+        isConnected = false;
+      });
+
+    // if (widget.auth.currentUser)
+  }
+
+// BoxDecoration boxDecorationShowImg() {
+//   return new BoxDecoration(
+//       shape: BoxShape.circle,
+//       border: Border.all(color: Colors.blueAccent, width: 2),
+//       image: new DecorationImage(
+//           fit: BoxFit.cover,
+//           image: _imageFile != null
+//               ? FileImage(_imageFile)
+//               : _imageUrl != null
+//                   ? isConnected
+//                       ? NetworkImage(_imageUrl)
+//                       : AssetImage("assets/images/defaultImage.png")
+//                   : AssetImage("assets/images/loadImgFailed.png")));
+// }
 
 // Form dialog Yes, No
   void _showDeleteYesNoDialog(BuildContext context, String title,

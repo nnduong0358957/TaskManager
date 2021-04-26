@@ -44,7 +44,7 @@ class _TaskInListState extends State<TaskInList> {
       title: Container(
         padding: EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: Color(0xFFF0F0F3),
+          color: Color(0xFFE2E2EA),
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
