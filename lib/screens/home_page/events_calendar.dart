@@ -1,6 +1,8 @@
 import 'dart:collection';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:todo_list_app/constants.dart';
 import 'package:todo_list_app/screens/home_page/taskInList.dart';
@@ -11,7 +13,8 @@ class TableCalendarWithEvents extends StatefulWidget {
   final List<dynamic> listTask;
 
   @override
-  _TableCalendarWithEventsState createState() => _TableCalendarWithEventsState();
+  _TableCalendarWithEventsState createState() =>
+      _TableCalendarWithEventsState();
 }
 
 class _TableCalendarWithEventsState extends State<TableCalendarWithEvents> {
@@ -40,56 +43,93 @@ class _TableCalendarWithEventsState extends State<TableCalendarWithEvents> {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
     initial();
     return SingleChildScrollView(
-      child: Container(
-        height: MediaQuery.of(context).size.height + 200,
-        child: Column(
-          children: [
-            TableCalendar(
-              firstDay: kNow,
-              lastDay: DateTime(
-                  kNow.year + 2, kNow.month, kNow.day, kNow.hour, kNow.minute),
-              focusedDay: _focusedDay,
-              calendarStyle: CalendarStyle(
-                  weekendTextStyle: TextStyle(color: Colors.red),
-                  defaultTextStyle: TextStyle(color: kPrimaryColor)),
-              selectedDayPredicate: (day) {
-                return isSameDay(_selectedDay, day);
-              },
-              onDaySelected: _onDaySelected,
-              calendarFormat: _calendarFormat,
-              onFormatChanged: (format) {
-                setState(() {
-                  _calendarFormat = format;
-                });
-              },
-              onPageChanged: (focusedDay) {
-                _focusedDay = focusedDay;
-              },
-              eventLoader: (day) {
-                return _getEventsForDay(day);
-              },
-            ),
-            const SizedBox(height: 8.0),
-            Expanded(
-              child: ValueListenableBuilder<List<dynamic>>(
-                valueListenable: _selectedEvents,
-                builder: (context, value, _) {
-                  return ListView.builder(
-                    itemCount: value.length,
-                    itemBuilder: (context, index) {
-                      return buildTaskInList(value[index]);
-                    },
-                  );
-                },
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          TableCalendar(
+            firstDay: kNow,
+            lastDay: DateTime(
+                kNow.year + 2, kNow.month, kNow.day, kNow.hour, kNow.minute),
+            focusedDay: _focusedDay,
+            calendarStyle: CalendarStyle(
+                weekendTextStyle: TextStyle(color: Colors.red),
+                defaultTextStyle: TextStyle(color: kPrimaryColor)),
+            selectedDayPredicate: (day) {
+              return isSameDay(_selectedDay, day);
+            },
+            onDaySelected: _onDaySelected,
+            calendarFormat: _calendarFormat,
+            onFormatChanged: (format) {
+              setState(() {
+                _calendarFormat = format;
+              });
+            },
+            onPageChanged: (focusedDay) {
+              _focusedDay = focusedDay;
+            },
+            eventLoader: (day) {
+              return _getEventsForDay(day);
+            },
+          ),
+          Column(
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(
+                    left: 26, right: 26, top: 8, bottom: 8),
+                child: Row(
+                  children: [
+                    Expanded(
+                        child: Divider(
+                      height: 1,
+                      thickness: 2,
+                      color: Colors.grey.withOpacity(0.6),
+                    )),
+                    Text(
+                      'Events',
+                      style: GoogleFonts.lato(
+                        fontSize: 20,
+                        color: Colors.blue[400],
+                        fontWeight: FontWeight.w700,
+                        fontStyle: FontStyle.italic,
+                      ),
+                    ),
+                    Expanded(
+                        child: Divider(
+                      height: 1,
+                      thickness: 2,
+                      color: Colors.grey.withOpacity(0.6),
+                    )),
+                  ],
+                ),
               ),
-            ),
-            SizedBox(
-              height: 200,
-            ),
-          ],
-        ),
+              _selectedEvents.value.length != 0
+                  ? Padding(
+                      padding: const EdgeInsets.only(top: 16.0, bottom: 260),
+                      child: ValueListenableBuilder<List<dynamic>>(
+                        valueListenable: _selectedEvents,
+                        builder: (context, value, _) {
+                          return ListView.builder(
+                            physics: NeverScrollableScrollPhysics(),
+                            shrinkWrap: true,
+                            itemCount: value.length,
+                            itemBuilder: (context, index) {
+                              return buildTaskInList(value[index]);
+                            },
+                          );
+                        },
+                      ),
+                    )
+                  : Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text("No events"),
+                    ),
+            ],
+          ),
+        ],
       ),
     );
   }

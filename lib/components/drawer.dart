@@ -1,7 +1,13 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:todo_list_app/constants.dart';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:path/path.dart' as Path;
 
 class AppDrawer extends StatefulWidget {
   const AppDrawer({Key key, this.auth, this.onSignOut}) : super(key: key);
@@ -14,62 +20,99 @@ class AppDrawer extends StatefulWidget {
 }
 
 class _AppDrawerState extends State<AppDrawer> {
+  firebase_storage.Reference ref;
+
+  TextEditingController displayNameController = TextEditingController();
+  final picker = ImagePicker();
+  File _imageFile;
+  String _imageUrl, _displayName, _oldPath;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    displayNameController.text = widget.auth.currentUser.displayName;
+    _imageUrl = widget.auth.currentUser.photoURL;
+    _displayName = widget.auth.currentUser.displayName;
+    _oldPath = widget.auth.currentUser.photoURL;
+  }
+
   @override
   Widget build(BuildContext context) {
     final currentUser = widget.auth.currentUser;
+
     return Drawer(
       child: ListView(
         padding: EdgeInsets.zero,
         children: <Widget>[
-          DrawerHeader(
-            decoration: new BoxDecoration(
-              image: DecorationImage(
-                  image: AssetImage("assets/images/drawer_header.jpg"),
-                  fit: BoxFit.cover),
-              gradient: new LinearGradient(
-                  colors: [
-                    const Color(0xFF3366FF),
-                    const Color(0xFF00CCFF),
-                  ],
-                  begin: const FractionalOffset(0.0, 1.0),
-                  end: const FractionalOffset(3.0, 0.0),
-                  stops: [0.0, 1.0],
-                  tileMode: TileMode.clamp),
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                currentUser.photoURL != null
-                    ? Container(
-                        width: 60,
-                        height: 60,
-                        child: ClipRRect(
-                            borderRadius: BorderRadius.circular(50),
-                            child: Image.network(currentUser.photoURL)),
+          Container(
+            height: 220,
+            child: DrawerHeader(
+              decoration: new BoxDecoration(
+                image: DecorationImage(
+                    image: AssetImage("assets/images/drawer_header.jpg"),
+                    fit: BoxFit.cover),
+                gradient: new LinearGradient(
+                    colors: [
+                      const Color(0xFF3366FF),
+                      const Color(0xFF00CCFF),
+                    ],
+                    begin: const FractionalOffset(0.0, 1.0),
+                    end: const FractionalOffset(3.0, 0.0),
+                    stops: [0.0, 1.0],
+                    tileMode: TileMode.clamp),
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Align(
+                    alignment: Alignment.topRight,
+                    child: InkWell(
+                      onTap: () {
+                        _pickImageDialog(context);
+                      },
+                      child: Container(
+                          width: 100.0,
+                          height: 100.0,
+                          decoration: new BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                  color: Colors.teal,
+                                  width: 1.0,
+                                  style: BorderStyle.solid),
+                              image: new DecorationImage(
+                                  fit: BoxFit.cover,
+                                  image: _imageFile != null
+                                      ? FileImage(_imageFile)
+                                      : _imageUrl != null
+                                          ? NetworkImage(_imageUrl)
+                                          : AssetImage(
+                                              "assets/images/defaultImage.png")))),
+                    ),
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _displayName != null
+                          ? Text(
+                              _displayName,
+                              style: TextStyle(
+                                color: kTextColor,
+                                fontSize: 16,
+                              ),
+                            )
+                          : SizedBox(),
+                      Text(
+                        currentUser.email,
+                        style: TextStyle(
+                          color: kTextColor,
+                        ),
                       )
-                    : SizedBox(),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    currentUser.displayName != null
-                        ? Text(
-                            currentUser.displayName,
-                            style: TextStyle(
-                              color: kTextColor,
-                              fontSize: 16,
-                            ),
-                          )
-                        : SizedBox(),
-                    Text(
-                      currentUser.email,
-                      style: TextStyle(
-                        color: kTextColor,
-                      ),
-                    )
-                  ],
-                ),
-              ],
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
           Align(
@@ -130,62 +173,96 @@ class _AppDrawerState extends State<AppDrawer> {
     );
   }
 
-  // Form dialog Yes, No
-  void _showDeleteYesNoDialog(BuildContext context, String title,
-      String content, final VoidCallback function) {
-    AlertDialog alertDialog = AlertDialog(
-      title: Container(
-        width: 100,
-        height: 100,
-        child: Image.asset("assets/images/warning.png"),
-      ),
-      content: Text(
-        content,
-        style: TextStyle(color: Colors.red, fontSize: 18),
-      ),
-      elevation: 24,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      actions: [
-        Row(
-          children: [
-            OutlineButton(
-              onPressed: () => Navigator.pop(context),
-              child: Padding(
-                padding: const EdgeInsets.only(left: 40, right: 40),
-                child: Text('No'),
-              ),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20)),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 20.0),
-              child: OutlineButton(
-                onPressed: () {
-                  function();
-                  Navigator.pop(context);
-                },
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 40, right: 40),
-                  child: Text(
-                    'Yes',
-                    style: TextStyle(color: Colors.red),
-                  ),
-                ),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20)),
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
-    showDialog(
-      context: context,
-      builder: (context) => alertDialog,
+  Future pickImage() async {
+    final pickedFile = await picker.getImage(source: ImageSource.gallery);
+
+    setState(() {
+      _imageFile = File(pickedFile.path);
+    });
+
+    if (pickedFile.path == null) retrieveLostData();
+  }
+
+  Future retrieveLostData() async {
+    final LostData response = await picker.getLostData();
+    if (response.isEmpty) {
+      return;
+    }
+    if (response.file != null) {
+      setState(() {
+        _imageFile = File(response.file.path);
+      });
+    }
+  }
+
+  Future uploadFile() async {
+    if (_oldPath != null) {
+      deleteImgFile(_oldPath);
+    }
+
+    if (_imageFile != null) {
+      ref = firebase_storage.FirebaseStorage.instance
+          .ref()
+          .child("images/${Path.basename(_imageFile.path)}");
+
+      await ref.putFile(_imageFile).whenComplete(() async {
+        await ref.getDownloadURL().then((value) async {
+          setState(() {
+            _imageUrl = value;
+          });
+          await updateUserInfo(displayNameController.text.trim(), _imageUrl);
+        });
+      });
+    } else
+      await updateUserInfo(displayNameController.text.trim(), null);
+  }
+
+  Future deleteImgFile(String path) async {
+    String fileName = path.replaceAll("/o/", "*");
+    fileName = fileName.replaceAll("?", "*");
+    fileName = fileName.split("*")[1];
+    fileName = fileName.replaceAll("%2F", "/");
+
+    print("$fileName");
+    ref = firebase_storage.FirebaseStorage.instance.ref().child(fileName);
+
+    await ref
+        .delete()
+        .then((_) => print('Successfully deleted $fileName storage item'));
+  }
+
+  Future updateUserInfo(String displayName, String url) async {
+    User user = widget.auth.currentUser;
+
+    if (url != null) {
+      user.updateProfile(displayName: displayName, photoURL: url);
+
+      setState(() {
+        _oldPath = url;
+      });
+    } else {
+      user.updateProfile(displayName: displayName);
+    }
+
+    setState(() {
+      _displayName = displayName;
+    });
+  }
+
+  TextField buildTextField(String labelText, String hintText,
+      TextEditingController controller, bool readOnly) {
+    return TextField(
+      controller: controller,
+      readOnly: readOnly,
+      maxLines: null, // để có thể nhập nhiều dòng trong TextField
+      decoration: InputDecoration(
+          labelText: labelText,
+          hintText: hintText,
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(5))),
     );
   }
 
-  // Thông báo reset password
+// Thông báo reset password
   void _showDialogResetPass(BuildContext context) {
     AlertDialog alertDialog = AlertDialog(
       content: Text(
@@ -212,5 +289,161 @@ class _AppDrawerState extends State<AppDrawer> {
       print(onError);
     });
     widget.onSignOut();
+  }
+
+  void resetFileImg() {
+    setState(() {
+      _imageFile = null;
+    });
+  }
+
+// Dialog pick image
+  void _pickImageDialog(BuildContext context) {
+    showDialog(
+        context: context,
+        builder: (context) {
+          bool refresh = false;
+          return StatefulBuilder(builder: (context, setState) {
+            return AlertDialog(
+              title: Text(
+                "User info",
+                style: GoogleFonts.lato(
+                    fontSize: 30,
+                    fontWeight: FontWeight.w700,
+                    fontStyle: FontStyle.italic,
+                    color: kPrimaryColor),
+              ),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    InkWell(
+                      onTap: () async {
+                        await pickImage();
+                        setState(() {
+                          refresh = !refresh;
+                        });
+                      },
+                      child: Container(
+                          width: 200.0,
+                          height: 200.0,
+                          decoration: new BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                  color: Colors.teal,
+                                  width: 10.0,
+                                  style: BorderStyle.solid),
+                              image: new DecorationImage(
+                                  fit: BoxFit.cover,
+                                  image: _imageFile != null
+                                      ? FileImage(_imageFile)
+                                      : _imageUrl != null
+                                          ? NetworkImage(_imageUrl)
+                                          : AssetImage(
+                                              "assets/images/defaultImage.png")))),
+                    ),
+                    SizedBox(height: 40),
+                    buildTextField(
+                        "User name", "", displayNameController, false)
+                  ],
+                ),
+              ),
+              elevation: 24,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20)),
+              actions: [
+                Row(
+                  children: [
+                    OutlineButton(
+                      onPressed: () {
+                        resetFileImg();
+                        Navigator.pop(context);
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 20, right: 20),
+                        child: Text('Cancel'),
+                      ),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20)),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 20.0),
+                      child: OutlineButton(
+                        onPressed: () {
+                          uploadFile();
+                          Navigator.pop(context);
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 20, right: 20),
+                          child: Text(
+                            'Save',
+                            style: TextStyle(color: Colors.red),
+                          ),
+                        ),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20)),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            );
+          });
+        });
+  }
+
+// Form dialog Yes, No
+  void _showDeleteYesNoDialog(BuildContext context, String title,
+      String content, final VoidCallback function) {
+    AlertDialog alertDialog = AlertDialog(
+      title: Container(
+        width: 100,
+        height: 100,
+        child: Image.asset("assets/images/warning.png"),
+      ),
+      content: Text(
+        content,
+        style: TextStyle(color: Colors.red, fontSize: 18),
+      ),
+      elevation: 24,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      actions: [
+        Row(
+          children: [
+            OutlineButton(
+              onPressed: () => Navigator.pop(context),
+              child: Padding(
+                padding: const EdgeInsets.only(left: 20, right: 20),
+                child: Text('No'),
+              ),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20)),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 20.0),
+              child: OutlineButton(
+                onPressed: () {
+                  function();
+                  Navigator.pop(context);
+                },
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 20, right: 20),
+                  child: Text(
+                    'Yes',
+                    style: TextStyle(color: Colors.red),
+                  ),
+                ),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20)),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+    showDialog(
+      context: context,
+      builder: (context) => alertDialog,
+    );
   }
 }

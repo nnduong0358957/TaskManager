@@ -115,7 +115,7 @@ class _FindByTagsState extends State<FindByTags> {
           ),
           SizedBox(
             height: 200,
-          )
+          ),
         ],
       ),
     );

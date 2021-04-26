@@ -45,7 +45,7 @@ class _SelectTypeState extends State<SelectType> {
     buttonList.add(new TypeButtonModel(false, 'Period'));
     buttonList.add(new TypeButtonModel(false, 'Weekly'));
 
-    periodTimeController.text = "1";
+    periodTimeController.text = widget.periodTime.toString();
   }
 
   @override

@@ -34,6 +34,7 @@ class _ListExpansionState extends State<ListExpansion> {
             expansionStatus = value;
           });
         },
+        backgroundColor: Colors.blue[50],
         leading: CircleAvatar(
             backgroundColor: Colors.black.withOpacity(.07),
             child: Icon(

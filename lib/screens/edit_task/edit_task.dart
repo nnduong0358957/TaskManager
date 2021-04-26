@@ -61,6 +61,7 @@ class _EditPageState extends State<EditPage> {
   @override
   void initState() {
     super.initState();
+    waitToRead();
 
     titleTaskController.text = widget.taskEdit["title"];
     contentController.text = widget.taskEdit["content"];
@@ -72,6 +73,9 @@ class _EditPageState extends State<EditPage> {
       typeAlarmValue = true;
       _selectedType = "Repeat";
       _typeRepeat = widget.taskEdit["typeRepeat"];
+
+      periodTime = widget.taskEdit["periodTime"];
+      timeUnit = widget.taskEdit["timeUnit"];
     }
 
     if (widget.taskEdit["subTasks"] != null) {
@@ -94,7 +98,6 @@ class _EditPageState extends State<EditPage> {
 
   @override
   Widget build(BuildContext context) {
-    waitToRead();
 
     if (isRead == true) {
       return MaterialApp(
@@ -414,9 +417,6 @@ class _EditPageState extends State<EditPage> {
 
   Future waitToRead() async {
     await readTypeOfWork();
-    setState(() {
-      isRead = true;
-    });
   }
 
   Future readTypeOfWork() async {
@@ -431,13 +431,16 @@ class _EditPageState extends State<EditPage> {
       if (values != null) {
         _tags = values.map((e) => MultiSelectItem<String>(e, e)).toList();
       }
+      setState(() {
+        isRead = true;
+      });
     });
   }
 
   Future doneTask() async {
     String path =
         "users/${auth.currentUser.uid}/tasks/${widget.taskEdit['key']}";
-    await ref.child(path).update({"isDone": true});
+    await ref.child(path).update({"isDone": true, "status": false});
     Navigator.pop(context);
     widget.homeRefresh();
   }

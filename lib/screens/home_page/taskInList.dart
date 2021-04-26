@@ -28,6 +28,7 @@ class _TaskInListState extends State<TaskInList> {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
     List<dynamic> listTag = [];
     DateTime dateTime = DateTime.parse(widget.task["dateTime"]);
     String time = dateTime.minute < 10
@@ -35,163 +36,152 @@ class _TaskInListState extends State<TaskInList> {
         : "${dateTime.hour}:${dateTime.minute}";
     if (widget.task["tags"] != null) listTag = widget.task["tags"];
 
-    return Container(
-      decoration: BoxDecoration(
-          border: Border(
-              bottom: BorderSide(color: Theme.of(context).dividerColor))),
-      child: ListTile(
-        onTap: () {
-          if (widget.task["isDone"] == false)
-            Navigator.of(context).push(_editRoute(widget.task));
-        },
-        title: widget.task["isDone"] == false
-            ? widget.task["status"] == true
-                ? Row(
-                    mainAxisSize: MainAxisSize.max,
-                    children: [
-                      Flexible(
-                        child: Padding(
-                          padding: const EdgeInsets.only(right: 8.0),
-                          child: Text(
-                            widget.task["title"],
-                            style: TextStyle(fontSize: 16),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ),
-                      Opacity(
-                        opacity: 0.8,
-                        child: Transform.scale(
-                          scale: 0.7,
-                          alignment: Alignment.topLeft,
-                          child: Chip(
-                            backgroundColor: kPrimaryColor,
-                            label: Row(
-                              children: [
-                                Text(
-                                  time,
-                                  style: TextStyle(
-                                      fontSize: 10, color: kTextColor),
-                                ),
-                                widget.task["typeAlarm"] == "Repeat"
-                                    ? Icon(
-                                        Icons.repeat,
-                                        size: 16,
-                                        color: kTextColor,
-                                      )
-                                    : SizedBox(),
-                                widget.task["typeRepeat"] == "Daily"
-                                    ? Text(" Daily",
-                                        style: TextStyle(
-                                          color: kTextColor,
-                                          fontSize: 8,
-                                        ))
-                                    : widget.task["typeRepeat"] == "Weekly"
-                                        ? Text(" Weekly",
-                                            style: TextStyle(
-                                              color: kTextColor,
-                                              fontSize: 8,
-                                            ))
-                                        : SizedBox()
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  )
-                : Row(
-                    children: [
-                      Flexible(
-                        child: Padding(
-                          padding: const EdgeInsets.only(right: 8.0),
-                          child: Text(
-                            widget.task["title"],
-                            style: TextStyle(
-                              color: Colors.grey,
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ),
-                      Opacity(
-                          opacity: 0.8,
-                          child: Transform.scale(
-                            scale: 0.7,
-                            alignment: Alignment.topLeft,
-                            child: Chip(
-                              label: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text(time,
-                                      style: TextStyle(
-                                          color: Colors.grey, fontSize: 10)),
-                                  widget.task["typeAlarm"] == "Repeat"
-                                      ? Icon(
-                                          Icons.repeat,
-                                          size: 16,
-                                          color: Colors.grey,
-                                        )
-                                      : SizedBox(),
-                                  widget.task["typeRepeat"] == "Daily"
-                                      ? Text(" Daily",
-                                          style: TextStyle(
-                                            color: Colors.grey,
-                                            fontSize: 8,
-                                          ))
-                                      : widget.task["typeRepeat"] == "Weekly"
-                                          ? Text(" Weekly",
-                                              style: TextStyle(
-                                                color: Colors.grey,
-                                                fontSize: 8,
-                                              ))
-                                          : SizedBox()
-                                ],
-                              ),
-                            ),
-                          ))
-                    ],
-                  )
-            : Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      ' ${widget.task["title"]} ',
-                      style: TextStyle(
-                        color: Colors.grey,
-                        decoration: TextDecoration.lineThrough,
-                        decorationThickness: 2,
-                      ),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ],
-              ),
-        subtitle: SubTitle(listTag: listTag),
-        dense: true,
-        leading: widget.task["isDone"] == false
-            ? Icon(Icons.panorama_fish_eye)
-            : Icon(Icons.check_circle),
-        trailing: widget.task["isDone"] == false
-            ? Transform.scale(
-                scale: 1.4,
-                child: Switch(
-                  value: widget.task["status"],
-                  onChanged: (bool newValue) async {
-                    setState(() {
-                      widget.task["status"] = newValue;
-                    });
-                    changeStatus(widget.task, newValue);
-                  },
+    return ListTile(
+      onTap: () {
+        if (widget.task["isDone"] == false)
+          Navigator.of(context).push(_editRoute(widget.task));
+      },
+      title: Container(
+        padding: EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: Color(0xFFF0F0F3),
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey,
+              blurRadius: 1.0,
+              spreadRadius: 0.0,
+              offset: Offset(2.0, 2.0), // shadow direction: bottom right
+            )
+          ],
+        ),
+        child: Opacity(
+          opacity: widget.task["status"] ? 1 : 0.5,
+          child: IntrinsicHeight(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                buildTimeField(time),
+                VerticalDivider(
+                  thickness: 2,
+                  width: 1,
+                  color: Colors.grey.withOpacity(0.6),
                 ),
-              )
-            : IconButton(
-                icon: Icon(Icons.cancel),
-                onPressed: () {
-                  _deleteTask(widget.task["key"]);
-                }),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    buildTitle(size),
+                    widget.task["content"] != ""
+                        ? Row(
+                            children: [
+                              widget.task["content"] == ""
+                                  ? SizedBox()
+                                  : Icon(Icons.assignment_outlined),
+                              SizedBox(width: 5),
+                              Container(
+                                  width: size.width - 200,
+                                  child: Text(
+                                    widget.task["content"],
+                                    overflow: TextOverflow.ellipsis,
+                                  )),
+                            ],
+                          )
+                        : Container(),
+                    Container(
+                        width: size.width - 180,
+                        child: SubTitle(listTag: listTag))
+                  ],
+                )
+              ],
+            ),
+          ),
+        ),
       ),
     );
+  }
+
+  Container buildTimeField(String time) {
+    return Container(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(time,
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+          widget.task["typeAlarm"] == "Repeat"
+              ? Icon(
+                  Icons.repeat,
+                  size: 16,
+                )
+              : Divider(
+                  height: 1,
+                ),
+          widget.task["typeAlarm"] == "Repeat"
+              ? widget.task["typeRepeat"] == "Daily"
+                  ? Text("Daily",
+                      style: TextStyle(
+                        fontSize: 8,
+                      ))
+                  : widget.task["typeRepeat"] == "Weekly"
+                      ? Text("Weekly",
+                          style: TextStyle(
+                            fontSize: 8,
+                          ))
+                      : widget.task["typeRepeat"] == "Period"
+                          ? Text(
+                              "${widget.task['periodTime']} ${widget.task['timeUnit']}",
+                              style: TextStyle(
+                                fontSize: 8,
+                              ))
+                          : SizedBox()
+              : SizedBox()
+        ],
+      ),
+    );
+  }
+
+  Container buildTitle(Size size) {
+    return Container(
+        width: size.width - 160,
+        child: Row(
+          children: [
+            Container(
+              width: size.width - 240,
+              child: Text(
+                widget.task["title"],
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    decorationThickness: 2,
+                    decoration: widget.task["isDone"]
+                        ? TextDecoration.lineThrough
+                        : null),
+              ),
+            ),
+            widget.task["isDone"] == false
+                ? Transform.scale(
+                    scale: 1.4,
+                    child: Switch(
+                      value: widget.task["status"],
+                      onChanged: (bool newValue) async {
+                        setState(() {
+                          widget.task["status"] = newValue;
+                        });
+                        changeStatus(widget.task, newValue);
+                      },
+                    ),
+                  )
+                : IconButton(
+                    icon: Icon(
+                      Icons.cancel,
+                      size: 36,
+                    ),
+                    onPressed: () {
+                      _deleteTask(widget.task["key"]);
+                    })
+          ],
+        ));
   }
 
   //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -253,8 +243,8 @@ class _TaskInListState extends State<TaskInList> {
       "status": newValue,
       "isMiss": true,
       "isShow": false,
-      "isAlertMiss": false,
-      "isAlertRemind": false
+      "isAlertMiss": true,
+      "isAlertRemind": true
     });
   }
 
