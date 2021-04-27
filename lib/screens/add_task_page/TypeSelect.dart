@@ -104,47 +104,48 @@ class _SelectTypeState extends State<SelectType> {
           SizedBox(
             height: 10,
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                "Thời gian lặp lại: ",
-                style: TextStyle(fontSize: 15),
-              ),
-              widget.typeRepeat == "Period"
-                  ? Container(width: 60, child: buildTextField())
-                  : SizedBox(),
-              DropdownButton(
-                  value: widget.timeUnit,
-                  onChanged: (String newValue) {
-                    widget.changeTimeUnit(newValue);
-                    if (newValue == "Minutes" && int.parse(periodTimeController.text) < 5) {
-                      widget.changePeriodTime(int.parse("5"));
-                      setState(() {
-                        periodTimeController.text = "5";
-                      });
-                    }
-                  },
-                  underline: Container(
-                    height: 2,
-                    color: Colors.deepPurpleAccent,
-                  ),
-                  style: const TextStyle(color: Colors.deepPurple),
-                  items: listUnitTime
-                      .map<DropdownMenuItem<String>>((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value == "Minutes"
-                          ? "Phút"
-                          : value == "Hours"
-                              ? "Giờ"
-                              : value == "Days"
-                                  ? "Ngày"
-                                  : ""),
-                    );
-                  }).toList())
-            ],
-          ),
+          widget.typeRepeat == "Period"
+              ? Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "Thời gian lặp lại: ",
+                      style: TextStyle(fontSize: 15),
+                    ),
+                    Container(width: 60, child: buildTextField()),
+                    DropdownButton(
+                        value: widget.timeUnit,
+                        onChanged: (String newValue) {
+                          widget.changeTimeUnit(newValue);
+                          if (newValue == "Minutes" &&
+                              int.parse(periodTimeController.text) < 5) {
+                            widget.changePeriodTime(int.parse("5"));
+                            setState(() {
+                              periodTimeController.text = "5";
+                            });
+                          }
+                        },
+                        underline: Container(
+                          height: 2,
+                          color: Colors.deepPurpleAccent,
+                        ),
+                        style: const TextStyle(color: Colors.deepPurple),
+                        items: listUnitTime
+                            .map<DropdownMenuItem<String>>((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value == "Minutes"
+                                ? "Phút"
+                                : value == "Hours"
+                                    ? "Giờ"
+                                    : value == "Days"
+                                        ? "Ngày"
+                                        : ""),
+                          );
+                        }).toList())
+                  ],
+                )
+              : Container(),
           SizedBox(
             height: 20,
           )
