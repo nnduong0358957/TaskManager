@@ -40,13 +40,13 @@ class _EditPageState extends State<EditPage> {
   String timeUnit = "Minutes";
   List<String> listSubTask = List<String>();
   List<String> listNameOfDay = [
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-    "Sunday"
+    "Thứ 2",
+    "Thứ 3",
+    "Thứ 4",
+    "Thứ 5",
+    "Thứ 6",
+    "Thứ 7",
+    "Chủ nhật"
   ];
   String _selectedType = 'One Time';
   String _typeRepeat;
@@ -116,11 +116,10 @@ class _EditPageState extends State<EditPage> {
               ),
               flexibleSpace: buildColorGradient(),
               title: Text(
-                'Edit Task',
+                'Sửa',
                 style: GoogleFonts.lato(
                     fontSize: 30,
                     fontWeight: FontWeight.w700,
-                    fontStyle: FontStyle.italic,
                     color: kTextColor),
               ),
               actions: [
@@ -129,11 +128,10 @@ class _EditPageState extends State<EditPage> {
                   child: Center(
                     child: FlatButton(
                       child: Text(
-                        'Save',
+                        'Lưu',
                         style: GoogleFonts.lato(
                             fontSize: 20,
                             fontWeight: FontWeight.w700,
-                            fontStyle: FontStyle.italic,
                             color: kTextColor),
                       ),
                       onPressed: () {
@@ -159,16 +157,13 @@ class _EditPageState extends State<EditPage> {
                       Padding(
                         padding: const EdgeInsets.only(top: 10.0, bottom: 30),
                         child: buildTextField(
-                            "Task name",
-                            "Please enter Task Name",
-                            titleTaskController,
-                            false),
+                            "Tên công việc", "", titleTaskController, false),
                       ),
                       Padding(
                         padding: const EdgeInsets.only(bottom: 20.0),
                         child: MultiSelectDialogField(
                           items: _tags,
-                          title: Text("Tags"),
+                          title: Text("Loại công việc"),
                           initialValue: _listSelectedTag,
                           selectedColor: Colors.blue,
                           buttonIcon: Icon(
@@ -176,7 +171,7 @@ class _EditPageState extends State<EditPage> {
                             color: Colors.blue,
                           ),
                           buttonText: Text(
-                            "Select tags",
+                            "Chọn loại công việc",
                             style: TextStyle(
                               fontSize: 14,
                             ),
@@ -196,14 +191,13 @@ class _EditPageState extends State<EditPage> {
                       SizedBox(
                         height: 10,
                       ),
-                      buildTextField("Content", "Please enter content of task",
-                          contentController, false),
+                      buildTextField("Nội dung", "", contentController, false),
                       Padding(
                         padding: const EdgeInsets.only(bottom: 20.0, top: 30),
                         child: Row(
                           children: [
                             Text(
-                              "One Time or Repeat:",
+                              "Chọn loại thông báo:",
                               style: TextStyle(
                                   fontWeight: FontWeight.bold, fontSize: 16),
                             ),
@@ -214,8 +208,8 @@ class _EditPageState extends State<EditPage> {
                                 //initial value
                                 value:
                                     _selectedType == "One Time" ? false : true,
-                                textOn: 'Repeat',
-                                textOff: 'One',
+                                textOn: 'Lặp lại',
+                                textOff: '1 lần',
                                 colorOn: Colors.greenAccent[700],
                                 colorOff: Colors.indigo,
                                 iconOn: Icons.replay,
@@ -234,7 +228,7 @@ class _EditPageState extends State<EditPage> {
                         ),
                       ),
                       Text(
-                        "REMIND ME WHEN:",
+                        "Thông báo vào lúc:",
                         style: TextStyle(fontSize: 16),
                       ),
                       SetTimeButton(
@@ -257,20 +251,20 @@ class _EditPageState extends State<EditPage> {
                       Row(
                         children: [
                           Text(
-                            "SUBTASKS",
+                            "Công việc phụ:",
                             style: TextStyle(fontSize: 17),
                           ),
                           Spacer(),
                           RaisedButton(
                             child: Row(
-                              children: [Icon(Icons.add), Text("New subtask")],
+                              children: [Icon(Icons.add), Text("Thêm")],
                             ),
                             onPressed: () {
                               if (subTaskController.text.trim() != "")
                                 listSubTask.add(subTaskController.text);
                               else
-                                _showAlertDialog(context, "Error!!!",
-                                    "Please enter the SubTask name");
+                                _showAlertDialog(context, "Lỗi!!!",
+                                    "Bạn chưa nhập nội dung công việc phụ.");
                               subTaskController.text = "";
                               _refreshPage();
                             },
@@ -279,8 +273,8 @@ class _EditPageState extends State<EditPage> {
                       ),
                       Padding(
                         padding: const EdgeInsets.only(top: 10.0, bottom: 10),
-                        child: buildTextField("SubTask name",
-                            "Add a new subtask", subTaskController, false),
+                        child: buildTextField(
+                            "Tên công việc", "", subTaskController, false),
                       ),
                       ListSubTask(
                           listSubTask: listSubTask,
@@ -292,11 +286,10 @@ class _EditPageState extends State<EditPage> {
                             child: Padding(
                               padding: const EdgeInsets.all(6.0),
                               child: Text(
-                                'Add Task',
+                                'Thêm',
                                 style: GoogleFonts.lato(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w700,
-                                    fontStyle: FontStyle.italic,
                                     color: Colors.red),
                               ),
                             ),
@@ -313,11 +306,10 @@ class _EditPageState extends State<EditPage> {
                             child: Padding(
                               padding: const EdgeInsets.all(6.0),
                               child: Text(
-                                'Done',
+                                'Hoàn thành',
                                 style: GoogleFonts.lato(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w700,
-                                    fontStyle: FontStyle.italic,
                                     color: Colors.lightGreen),
                               ),
                             ),
@@ -355,8 +347,8 @@ class _EditPageState extends State<EditPage> {
         _selectedTime != null)
       updateData();
     else
-      _showAlertDialog(context, "Error!!!",
-          "You need to complete set name and time to Save this task");
+      _showAlertDialog(context, "Lỗi!!!",
+          "Bạn cần đặt tên công việc và chọn thời gian thông báo để có thể lưu công việc này.");
   }
 
   // Nhập dữ liệu vào User
@@ -404,8 +396,8 @@ class _EditPageState extends State<EditPage> {
       _selectedTime = null;
       selectedDateTimeString = null;
       _refreshPage();
-      _showAlertDialog(context, "Error!",
-          "You chosen time in the past.\nPlease select again.");
+      _showAlertDialog(context, "Lỗi!",
+          "Bạn đang chọn thời gian ở quá khứ.\n Làm ơn hãy chọn lại.");
     }
   }
 
@@ -452,13 +444,13 @@ class _EditPageState extends State<EditPage> {
     if (_selectedDate == null) {
       _selectedTime = null;
       selectedDateTimeString = null;
-      _showAlertDialog(context, "Error!!!", "You have not selected date");
+      _showAlertDialog(context, "Lỗi!!!", "Chọn chưa chọn ngày");
       _refreshPage();
     } else {
       _selectedTime = await _selectTime(_selectedTime);
       if (_selectedTime == null) {
         selectedDateTimeString = null;
-        _showAlertDialog(context, "Error!!!", "You have not selected time");
+        _showAlertDialog(context, "Lỗi!!!", "Bạn chưa chọn thời gian");
         _refreshPage();
       } else {
         setState(() {
@@ -567,18 +559,18 @@ class _EditPageState extends State<EditPage> {
 
     if (_selectedType == "One Time") {
       if (selectedDate == dateNow)
-        return 'Today at ${selectedTime.hour}:$minute';
+        return 'Hôm nay lúc ${selectedTime.hour}:$minute';
       else if (selectedDate == tomorrow)
-        return 'Tomorrow at ${selectedTime.hour}:$minute';
+        return 'Ngày mai lúc ${selectedTime.hour}:$minute';
       else
         return '${selectedDate.day}/${selectedDate.month}/${selectedDate.year} at ${selectedTime.hour}:$minute';
     } else if (_selectedType == "Repeat") {
       if (_typeRepeat == "Daily")
-        return "Once a day at ${selectedTime.hour}:$minute";
+        return "Mỗi ngày lúc ${selectedTime.hour}:$minute";
       else if (_typeRepeat == "Weekly")
-        return "Once a week on $nameOfDayOfWeek at ${selectedTime.hour}:$minute";
+        return "Mỗi tuần vào $nameOfDayOfWeek lúc ${selectedTime.hour}:$minute";
       else if (_typeRepeat == "Period")
-        return "Repeat every 3 minutes from $nameOfDayOfWeek at ${selectedTime.hour}:$minute";
+        return "Lặp lại mỗi $periodTime ${timeUnit == "Minutes" ? "phút" : timeUnit == "Hours" ? "giờ" : timeUnit == "Days" ? "ngày" : ""} từ ${selectedTime.hour}:$minute";
     }
   }
 
@@ -597,7 +589,7 @@ class _EditPageState extends State<EditPage> {
 
   void removeFromList(String subTask) {
     _showDeleteYesNoDialog(
-        context, "Delete SubTask", "Do you want to delete $subTask", subTask);
+        context, "Xóa công việc phụ", "Bạn có chắc muốn xóa $subTask", subTask);
   }
 
 // Form viết sẵn để hiển thị dialog
@@ -658,7 +650,7 @@ class _EditPageState extends State<EditPage> {
               onPressed: () => Navigator.pop(context),
               child: Padding(
                 padding: const EdgeInsets.only(left: 40, right: 40),
-                child: Text('No'),
+                child: Text('Hủy'),
               ),
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20)),
@@ -674,7 +666,7 @@ class _EditPageState extends State<EditPage> {
                 child: Padding(
                   padding: const EdgeInsets.only(left: 40, right: 40),
                   child: Text(
-                    'Yes',
+                    'Tiếp tục',
                     style: TextStyle(color: Colors.red),
                   ),
                 ),
@@ -699,7 +691,7 @@ class _EditPageState extends State<EditPage> {
         height: 100,
         child: Image.asset("assets/images/warning.png"),
       ),
-      content: Text("Are you sure to delete this task?",
+      content: Text("Bạn có chắc muốn xóa công việc này?",
           style: TextStyle(color: Colors.red, fontSize: 16)),
       elevation: 24,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
@@ -710,7 +702,7 @@ class _EditPageState extends State<EditPage> {
               onPressed: () => Navigator.pop(context),
               child: Padding(
                 padding: const EdgeInsets.only(left: 40, right: 40),
-                child: Text('No'),
+                child: Text('Hủy'),
               ),
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20)),
@@ -727,7 +719,7 @@ class _EditPageState extends State<EditPage> {
                 child: Padding(
                   padding: const EdgeInsets.only(left: 40, right: 40),
                   child: Text(
-                    'Yes',
+                    'Xóa',
                     style: TextStyle(color: Colors.red),
                   ),
                 ),

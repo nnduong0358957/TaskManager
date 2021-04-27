@@ -48,11 +48,10 @@ class _ForgotPassState extends State<ForgotPass> {
                             padding:
                                 const EdgeInsets.only(bottom: 50.0, top: 60),
                             child: Text(
-                              'Find your password',
+                              'Tìm mật khẩu của bạn',
                               style: GoogleFonts.lato(
                                   fontSize: 20,
                                   fontWeight: FontWeight.w700,
-                                  fontStyle: FontStyle.italic,
                                   color: Colors.blue[800]),
                             ),
                           ),
@@ -62,7 +61,7 @@ class _ForgotPassState extends State<ForgotPass> {
                             child: Column(
                               children: [
                                 Text(
-                                    "Please enter your email to find your password"),
+                                    "Nhập email để tìm lại mật khẩu của bạn"),
                                 TextFormField(
                                     decoration: InputDecoration(
                                       prefixIcon: Icon(Icons.email),
@@ -72,10 +71,10 @@ class _ForgotPassState extends State<ForgotPass> {
                                       _email = newValue;
                                     },
                                     validator: (value) => value.isEmpty
-                                        ? "Please enter the email"
+                                        ? "Bạn chưa nhập email"
                                         : EmailValidator.validate(value)
                                             ? null
-                                            : "Invalid email"),
+                                            : "Email không hợp lệ"),
                                 Padding(
                                   padding: const EdgeInsets.only(
                                       top: 50, bottom: 20),
@@ -88,7 +87,7 @@ class _ForgotPassState extends State<ForgotPass> {
                                           child: FlatButton(
                                             onPressed: () =>
                                                 Navigator.pop(context),
-                                            child: Text("Back"),
+                                            child: Text("Quay lại"),
                                           )),
                                       ButtonTheme(
                                         minWidth: 150,
@@ -98,7 +97,7 @@ class _ForgotPassState extends State<ForgotPass> {
                                               borderRadius:
                                                   BorderRadius.circular(10)),
                                           child: Text(
-                                            'Find',
+                                            'Tìm kiếm',
                                             style: TextStyle(fontSize: 18),
                                           ),
                                           color: kPrimaryColor,
@@ -113,7 +112,7 @@ class _ForgotPassState extends State<ForgotPass> {
                                                 if (e.code ==
                                                     "too-many-requests") {
                                                   _showAlertDialog(context,
-                                                      "You requests too much. Please try again later.");
+                                                      "Yêu cầu của bạn quá nhiều. Làm ơn thử lại sau.");
                                                   setState(() {
                                                     error = true;
                                                   });
@@ -121,7 +120,7 @@ class _ForgotPassState extends State<ForgotPass> {
                                                 if (e.code ==
                                                     "user-not-found") {
                                                   _showAlertDialog(context,
-                                                      "User not found. You entered your email incorrectly or is not registered");
+                                                      "Không tìm thấy tài khoản. Email bạn nhập bị sai hoặc chưa được đăng ký.");
                                                   setState(() {
                                                     error = true;
                                                   });
@@ -156,7 +155,7 @@ class _ForgotPassState extends State<ForgotPass> {
   void _showDialogResetPass(BuildContext context) {
     AlertDialog alertDialog = AlertDialog(
       content: Text(
-          "An email will be sent to your email.\nPlease change the password there."),
+          "Một email sẽ được gửi vào email của bạn.\nLàm ơn hãy thay đổi mật khẩu ở đây."),
       actions: [
         FlatButton(onPressed: () => Navigator.pop(context), child: Text('Ok'))
       ],

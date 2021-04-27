@@ -89,7 +89,7 @@ class _TableCalendarWithEventsState extends State<TableCalendarWithEvents> {
                       color: Colors.grey.withOpacity(0.6),
                     )),
                     Text(
-                      'Events',
+                      'Công việc',
                       style: GoogleFonts.lato(
                         fontSize: 20,
                         color: Colors.blue[400],
@@ -125,7 +125,7 @@ class _TableCalendarWithEventsState extends State<TableCalendarWithEvents> {
                     )
                   : Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: Text("No events"),
+                      child: Text("Không có công việc"),
                     ),
             ],
           ),

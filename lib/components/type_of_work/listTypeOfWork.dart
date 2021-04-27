@@ -54,7 +54,7 @@ class _ListTypeOfWorkState extends State<ListTypeOfWork> {
                   }
                 });
               },
-              child: Text("Add"),
+              child: Text("Thêm"),
             ),
           ),
           SizedBox(
@@ -74,7 +74,7 @@ class _ListTypeOfWorkState extends State<ListTypeOfWork> {
                         });
                       } else
                         _showAlertDialog(context,
-                            "List of job types must have at least one");
+                            "Danh sách loại công việc phải có ít nhất 1 loại!");
                     },
                   ))
             ],
@@ -89,7 +89,7 @@ class _ListTypeOfWorkState extends State<ListTypeOfWork> {
       controller: typeOfWorkController,
       maxLines: null, // để có thể nhập nhiều dòng trong TextField
       decoration: InputDecoration(
-          labelText: "Add type",
+          labelText: "Thêm loại công việc",
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(5))),
     );
   }

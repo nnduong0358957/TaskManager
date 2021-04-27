@@ -118,18 +118,18 @@ class _TaskInListState extends State<TaskInList> {
                 ),
           widget.task["typeAlarm"] == "Repeat"
               ? widget.task["typeRepeat"] == "Daily"
-                  ? Text("Daily",
+                  ? Text("Hàng ngày",
                       style: TextStyle(
                         fontSize: 8,
                       ))
                   : widget.task["typeRepeat"] == "Weekly"
-                      ? Text("Weekly",
+                      ? Text("Hàng tuần",
                           style: TextStyle(
                             fontSize: 8,
                           ))
                       : widget.task["typeRepeat"] == "Period"
                           ? Text(
-                              "${widget.task['periodTime']} ${widget.task['timeUnit']}",
+                              "${widget.task['periodTime']} ${widget.task['timeUnit'] == "Minutes" ? "phút" : widget.task['timeUnit'] == "Hours" ? "giờ" : widget.task['timeUnit'] == "Days" ? "ngày" : ""}",
                               style: TextStyle(
                                 fontSize: 8,
                               ))

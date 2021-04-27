@@ -89,11 +89,10 @@ class _MyHomePageState extends State<MyHomePage> {
                     ],
                   ),
                   title: Text(
-                    'All Tasks',
+                    'Công việc',
                     style: GoogleFonts.lato(
                         fontSize: 30,
                         fontWeight: FontWeight.w700,
-                        fontStyle: FontStyle.italic,
                         color: kTextColor),
                   ),
                 ),
@@ -104,7 +103,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     onPressed: () {
                       Navigator.of(context).push(_createRoute());
                     },
-                    tooltip: 'Add task',
+                    tooltip: 'Thêm công việc',
                     child: Icon(
                       Icons.add,
                       size: 50,
@@ -125,12 +124,12 @@ class _MyHomePageState extends State<MyHomePage> {
                       child: Column(
                         children: [
                           ListExpansion(
-                              title: "Today", listTask: listCategory["Today"]),
+                              title: "Hôm nay", listTask: listCategory["Today"]),
                           ListExpansion(
-                              title: "Tomorrow",
+                              title: "Ngày mai",
                               listTask: listCategory["Tomorrow"]),
                           ListExpansion(
-                            title: "Upcoming",
+                            title: "Sắp đến",
                             listTask: listCategory["Upcoming"],
                           ),
                           SizedBox(
@@ -143,10 +142,10 @@ class _MyHomePageState extends State<MyHomePage> {
                       child: Column(
                         children: [
                           ListExpansion(
-                              title: "One Time",
+                              title: "Một lần",
                               listTask: listCategory["One Time"]),
                           ListExpansion(
-                              title: "Repeat",
+                              title: "Lặp lại",
                               listTask: listCategory["Repeat"]),
                           SizedBox(
                             height: 200,
@@ -522,7 +521,7 @@ class _MyHomePageState extends State<MyHomePage> {
             children: [
               Padding(
                 padding: const EdgeInsets.only(bottom: 16.0),
-                child: Text("You have missed out on some tasks recently"),
+                child: Text("Bạn đã bỏ lỡ một số công việc gần đây"),
               ),
               Container(
                 height: deviceHeight * 20 / 100,
@@ -570,7 +569,7 @@ class _MyHomePageState extends State<MyHomePage> {
             new OutlineButton(
               shape: new RoundedRectangleBorder(
                   borderRadius: new BorderRadius.circular(30.0)),
-              child: new Text("Remind me later"),
+              child: new Text("Nhắc tôi lần sau"),
               onPressed: () {
                 Navigator.of(context).pop();
               },
@@ -598,7 +597,7 @@ class _MyHomePageState extends State<MyHomePage> {
   void remindTask(List<dynamic> listRemind) {
     listRemind.forEach((task) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        _showAlertDialog(context, "You should to do ${task["title"]} now!");
+        _showAlertDialog(context, "Bạn nên thực hiện ${task["title"]} bây giờ!");
       });
     });
   }

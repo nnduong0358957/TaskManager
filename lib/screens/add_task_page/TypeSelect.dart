@@ -80,7 +80,13 @@ class _SelectTypeState extends State<SelectType> {
                       child: Container(
                         width: 70,
                         child: Text(
-                          buttonList[index].buttonText,
+                          buttonList[index].buttonText == "Daily"
+                              ? "Hàng ngày"
+                              : buttonList[index].buttonText == "Weekly"
+                                  ? "Hàng tuần"
+                                  : buttonList[index].buttonText == "Period"
+                                      ? "Chu kỳ"
+                                      : "",
                           style: TextStyle(
                               color: buttonList[index].isSelected
                                   ? Colors.white
@@ -103,7 +109,7 @@ class _SelectTypeState extends State<SelectType> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                "Period time: ",
+                "Thời gian lặp lại: ",
                 style: TextStyle(fontSize: 15),
               ),
               widget.typeRepeat == "Period"
@@ -123,7 +129,13 @@ class _SelectTypeState extends State<SelectType> {
                       .map<DropdownMenuItem<String>>((String value) {
                     return DropdownMenuItem<String>(
                       value: value,
-                      child: Text(value),
+                      child: Text(value == "Minutes"
+                          ? "Phút"
+                          : value == "Hours"
+                              ? "Giờ"
+                              : value == "Days"
+                                  ? "Ngày"
+                                  : ""),
                     );
                   }).toList())
             ],

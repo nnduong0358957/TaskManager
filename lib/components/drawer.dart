@@ -76,7 +76,7 @@ class _AppDrawerState extends State<AppDrawer> {
                           _pickImageDialog(context);
                         else
                           _showDialogResetPass(
-                              context, "No network connection.");
+                              context, "Không có kết nối internet.");
                       },
                       child: buildContainerImage(100, 100),
                     ),
@@ -113,12 +113,12 @@ class _AppDrawerState extends State<AppDrawer> {
                 size: 30,
               ),
               title: Text(
-                'Reset Password',
+                'Đặt lại mật khẩu',
               ),
               onTap: () {
                 widget.auth.sendPasswordResetEmail(email: currentUser.email);
                 _showDialogResetPass(context,
-                    "An email will be sent to your email.\nPlease change the password there.");
+                    "Một email sẽ được gửi tới địa chỉ email của bạn.\nLàm ơn thay đổi mật khẩu ở đó.");
               },
             ),
           ),
@@ -130,13 +130,13 @@ class _AppDrawerState extends State<AppDrawer> {
                 size: 30,
               ),
               title: Text(
-                'Delete Account',
+                'Xóa tài khoản',
               ),
               onTap: () {
                 _showDeleteYesNoDialog(
                     context,
                     "",
-                    "Are you sure you want to delete account?\nIt will delete all of your tasks and history. You can't undo this.",
+                    "Bạn có chắc muốn xóa tài khoản này?\nĐiều này sẽ xóa toàn bộ lịch sử công việc của bạn. Bạn sẽ không thể trở về khôi phục lại.",
                     _handleDelete);
               },
             ),
@@ -150,12 +150,15 @@ class _AppDrawerState extends State<AppDrawer> {
                 size: 30,
               ),
               title: Text(
-                'Log Out',
+                'Đăng xuất',
                 style: TextStyle(color: Colors.red),
               ),
               onTap: () {
-                _showDeleteYesNoDialog(context, "",
-                    "Are you sure you want to log out?", _handleSignOut);
+                _showDeleteYesNoDialog(
+                    context,
+                    "",
+                    "Bạn có chắc muốn đăng xuất khỏi tài khoản này? \nBạn sẽ phải cần có kết nối internet để có thể đăng nhập lại.",
+                    _handleSignOut);
               },
             ),
           ),
@@ -307,7 +310,7 @@ class _AppDrawerState extends State<AppDrawer> {
                     ),
                     SizedBox(height: 40),
                     buildTextField(
-                        "User name", "", displayNameController, false)
+                        "Tên người dùng:", "", displayNameController, false)
                   ],
                 ),
               ),
@@ -324,7 +327,7 @@ class _AppDrawerState extends State<AppDrawer> {
                       },
                       child: Padding(
                         padding: const EdgeInsets.only(left: 20, right: 20),
-                        child: Text('Cancel'),
+                        child: Text('Hủy'),
                       ),
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20)),
@@ -341,7 +344,7 @@ class _AppDrawerState extends State<AppDrawer> {
                         child: Padding(
                           padding: const EdgeInsets.only(left: 20, right: 20),
                           child: Text(
-                            'Save',
+                            'Lưu',
                             style: TextStyle(color: Colors.red),
                           ),
                         ),
@@ -452,7 +455,7 @@ class _AppDrawerState extends State<AppDrawer> {
               onPressed: () => Navigator.pop(context),
               child: Padding(
                 padding: const EdgeInsets.only(left: 20, right: 20),
-                child: Text('No'),
+                child: Text('Hủy'),
               ),
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20)),
@@ -467,7 +470,7 @@ class _AppDrawerState extends State<AppDrawer> {
                 child: Padding(
                   padding: const EdgeInsets.only(left: 20, right: 20),
                   child: Text(
-                    'Yes',
+                    'Tiếp tục',
                     style: TextStyle(color: Colors.red),
                   ),
                 ),
@@ -491,7 +494,7 @@ class _AppDrawerState extends State<AppDrawer> {
         children: [
           CircularProgressIndicator(),
           Container(
-              margin: EdgeInsets.only(left: 7), child: Text("Loading...")),
+              margin: EdgeInsets.only(left: 7), child: Text("Đang lưu...")),
         ],
       ),
     );

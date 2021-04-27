@@ -31,12 +31,12 @@ class _SignUpPageState extends State<SignUpPage> {
       if (e.code == 'weak-password') {
         print('Password too weak');
         setState(() {
-          _error = 'Password too weak';
+          _error = 'Mật khẩu quá ngắn';
         });
       } else if (e.code == 'email-already-in-use') {
         print('Email already in use');
         setState(() {
-          _error = 'Email already in use';
+          _error = 'Tài khoản này đã được đăng ký';
         });
       } else
         print(e);
@@ -44,9 +44,10 @@ class _SignUpPageState extends State<SignUpPage> {
 
     // True là báo thành công, false là báo thất bại
     if (_error == null)
-      _showAlertDialog(context, true, "Success!", "Welcome to our app");
+      _showAlertDialog(context, true, "Thành công!",
+          "Chào mừng bạn đến với ứng dụng của chúng tôi");
     else
-      _showAlertDialog(context, false, "Error!", _error);
+      _showAlertDialog(context, false, "Lỗi!", _error);
   }
 
   Future _showAlertDialog(
@@ -112,11 +113,10 @@ class _SignUpPageState extends State<SignUpPage> {
                         Padding(
                           padding: const EdgeInsets.only(bottom: 50.0, top: 60),
                           child: Text(
-                            'Register',
+                            'Đăng ký',
                             style: GoogleFonts.lato(
                                 fontSize: 40,
                                 fontWeight: FontWeight.w700,
-                                fontStyle: FontStyle.italic,
                                 color: Colors.blue[800]),
                           ),
                         ),
@@ -137,10 +137,10 @@ class _SignUpPageState extends State<SignUpPage> {
                                       _email = newValue;
                                     },
                                     validator: (value) => value.isEmpty
-                                        ? "Please enter the email"
+                                        ? "Bạn chưa nhập email"
                                         : EmailValidator.validate(value)
                                             ? null
-                                            : "Invalid email"),
+                                            : "Email không hợp lệ"),
                               ),
                               Padding(
                                 padding: const EdgeInsets.only(
@@ -148,7 +148,7 @@ class _SignUpPageState extends State<SignUpPage> {
                                 child: TextFormField(
                                   decoration: InputDecoration(
                                       prefixIcon: Icon(Icons.lock),
-                                      labelText: 'Password',
+                                      labelText: 'Mật khẩu',
                                       suffixIcon: IconButton(
                                         icon: _obscureText
                                             ? Icon(Icons.visibility_off)
@@ -160,9 +160,9 @@ class _SignUpPageState extends State<SignUpPage> {
                                   },
                                   // ignore: missing_return
                                   validator: (value) => value.isEmpty
-                                      ? "Please enter the password"
+                                      ? "Bạn chưa nhập mật khẩu"
                                       : value.length < 6
-                                          ? "Password must be longer than 6 characters"
+                                          ? "Mật khẩu phải có hơn 6 ký tự"
                                           : null,
                                   obscureText: _obscureText,
                                 ),
@@ -179,7 +179,7 @@ class _SignUpPageState extends State<SignUpPage> {
                                         child: FlatButton(
                                           onPressed: () =>
                                               Navigator.pop(context),
-                                          child: Text("Back"),
+                                          child: Text("Quay lại"),
                                         )),
                                     ButtonTheme(
                                       minWidth: 150,
@@ -189,7 +189,7 @@ class _SignUpPageState extends State<SignUpPage> {
                                             borderRadius:
                                                 BorderRadius.circular(10)),
                                         child: Text(
-                                          'Register',
+                                          'Đăng ký',
                                           style: TextStyle(fontSize: 18),
                                         ),
                                         color: kPrimaryColor,

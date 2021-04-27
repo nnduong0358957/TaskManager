@@ -37,7 +37,7 @@ class NotificationService extends ChangeNotifier {
     String time, title, body, payload;
     time = task["dateTime"];
     title = task["title"];
-    body = "You have a job right now";
+    body = "Bạn có một công việc ngay bây giờ!";
     payload = task["key"];
 
     print("Called instantNotification");
@@ -66,7 +66,7 @@ class NotificationService extends ChangeNotifier {
     String time, title, body, payload;
     time = task["dateTime"];
     title = task["title"];
-    body = "You have a job right now";
+    body = "Bạn có một công việc ngay bây giờ!";
     payload = task["key"];
 
     tz.initializeTimeZones();
@@ -124,7 +124,7 @@ class NotificationService extends ChangeNotifier {
               payload: payload,
               androidAllowWhileIdle: true,
               uiLocalNotificationDateInterpretation:
-              UILocalNotificationDateInterpretation.absoluteTime);
+                  UILocalNotificationDateInterpretation.absoluteTime);
         }
       });
     }

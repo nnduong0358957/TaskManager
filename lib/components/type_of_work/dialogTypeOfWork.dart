@@ -27,7 +27,7 @@ class _DialogTypeOfWorkState extends State<DialogTypeOfWork> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(Icons.add),
-          Text("Add new type"),
+          Text("Thêm loại công việc"),
         ],
       ),
     );
@@ -41,7 +41,7 @@ class _DialogTypeOfWorkState extends State<DialogTypeOfWork> {
         return AlertDialog(
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          title: Text('Type of work'),
+          title: Text('Loại công việc'),
           content: ListTypeOfWork(
               typeOfWork: widget.typeOfWork, updateNewList: updateNewList),
           actions: <Widget>[
@@ -50,7 +50,7 @@ class _DialogTypeOfWorkState extends State<DialogTypeOfWork> {
                   borderRadius: BorderRadius.circular(10)),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Text('Cancel'),
+                child: Text('Hủy'),
               ),
               onPressed: () {
                 Navigator.of(context).pop();
@@ -62,7 +62,7 @@ class _DialogTypeOfWorkState extends State<DialogTypeOfWork> {
               color: kPrimaryColor,
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Text('Save'),
+                child: Text('Lưu'),
               ),
               onPressed: () async {
                 await updateFirebase(newList);

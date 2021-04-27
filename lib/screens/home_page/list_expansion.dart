@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:implicitly_animated_reorderable_list/transitions.dart';
 import 'package:todo_list_app/constants.dart';
-import 'package:todo_list_app/modules/task.dart';
 import 'package:todo_list_app/screens/home_page/taskInList.dart';
 import 'package:implicitly_animated_reorderable_list/implicitly_animated_reorderable_list.dart';
 
@@ -56,7 +54,6 @@ class _ListExpansionState extends State<ListExpansion> {
           style: GoogleFonts.lato(
               fontSize: 20,
               fontWeight: FontWeight.w700,
-              fontStyle: FontStyle.italic,
               color: kPrimaryColor),
         ),
         expandedAlignment: Alignment.topLeft,

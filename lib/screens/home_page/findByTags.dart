@@ -35,7 +35,7 @@ class _FindByTagsState extends State<FindByTags> {
           Padding(
             padding: const EdgeInsets.only(top: 20, left: 16),
             child: Text(
-              "Select tags to find:",
+              "Chọn loại công việc cần tìm:",
               style: TextStyle(
                 fontSize: 16,
               ),
@@ -46,7 +46,7 @@ class _FindByTagsState extends State<FindByTags> {
             child: MultiSelectDialogField(
               items: _tags,
               initialValue: _listSelectedTag,
-              title: Text("Tags"),
+              title: Text("Loại công việc"),
               selectedColor: Colors.blue,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.all(Radius.circular(40)),
@@ -60,7 +60,7 @@ class _FindByTagsState extends State<FindByTags> {
                 color: Colors.blue,
               ),
               buttonText: Text(
-                "Select tags",
+                "Chọn loại công việc",
                 style: TextStyle(
                   fontSize: 14,
                 ),

@@ -30,7 +30,7 @@ class _SetTimeButtonState extends State<SetTimeButton> {
               onPressed: () {
                 widget.ChangeSelectedTime();
               },
-              child: Text("Remove", style: TextStyle(
+              child: Text("Xóa", style: TextStyle(
                 color: Colors.red[700]
               ),)),
         ),
@@ -38,35 +38,26 @@ class _SetTimeButtonState extends State<SetTimeButton> {
     else {
       return Padding(
         padding: const EdgeInsets.only(top: 10, bottom: 10.0),
-        child: Row(
-          children: [
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.only(right: 10),
-                child: RaisedButton(
-                  child: Row(
-                    children: [
-                      Icon(Icons.date_range, color: kPrimaryColor,),
-                      Padding(
-                        padding: const EdgeInsets.only(left: 4.0),
-                        child: Text(
-                          "Set time",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: kPrimaryColor
-                          ),
-                        ),
-                      ),
-                    ],
+        child: RaisedButton(
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.date_range, color: kPrimaryColor,),
+              Padding(
+                padding: const EdgeInsets.only(left: 4.0),
+                child: Text(
+                  "Chọn thời gian",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: kPrimaryColor
                   ),
-                  onPressed: () {
-                    widget.selectTimeAlert();
-                  },
                 ),
               ),
-            ),
-            Expanded(child: SizedBox()),
-          ],
+            ],
+          ),
+          onPressed: () {
+            widget.selectTimeAlert();
+          },
         ),
       );
     }

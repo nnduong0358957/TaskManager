@@ -55,7 +55,7 @@ class _MyLoginPageState extends State<MyLoginPage> {
       builder: (context, snapshot) {
         // Kiểm tra xem có bị lỗi khi initialize không
         if (snapshot.hasError) {
-          return Text('Something went wrong');
+          return Text('Có lỗi');
         }
         // Nếu thành công thì hiển thị như lúc đầu chúng ta đã tạo
         if (snapshot.connectionState == ConnectionState.done) {
@@ -132,7 +132,7 @@ class _MyLoginPageState extends State<MyLoginPage> {
                                             ),
                                           ),
                                           SizedBox(width: 12),
-                                          Text('Sign in with Google',
+                                          Text('Đăng nhập bằng Google',
                                               style:
                                                   TextStyle(color: kTextColor)),
                                         ],
@@ -154,7 +154,7 @@ class _MyLoginPageState extends State<MyLoginPage> {
                                 }));
                               },
                               child: Text(
-                                "Forgot password?",
+                                "Quên mật khẩu?",
                                 style: TextStyle(color: kPrimaryColor),
                               ),
                             ),
@@ -167,7 +167,7 @@ class _MyLoginPageState extends State<MyLoginPage> {
                                 }));
                               },
                               child: Text(
-                                "Create an Account",
+                                "Tạo tài khoản",
                                 style: TextStyle(color: Colors.orange[800]),
                               ),
                             ),
@@ -210,11 +210,10 @@ class _MyLoginPageState extends State<MyLoginPage> {
           Padding(
             padding: const EdgeInsets.only(bottom: 50.0),
             child: Text(
-              'Login',
+              'Đăng nhập',
               style: GoogleFonts.lato(
                   fontSize: 40,
                   fontWeight: FontWeight.w700,
-                  fontStyle: FontStyle.italic,
                   color: Colors.blue[800]),
             ),
           ),
@@ -229,17 +228,17 @@ class _MyLoginPageState extends State<MyLoginPage> {
                   _email = newValue;
                 },
                 validator: (value) => value.isEmpty
-                    ? "Please enter the email"
+                    ? "Bạn chưa nhập email"
                     : EmailValidator.validate(value)
                         ? null
-                        : "Invalid email"),
+                        : "Email không hợp lệ"),
           ),
           Padding(
             padding: const EdgeInsets.only(left: 10.0, right: 10.0, top: 20.0),
             child: TextFormField(
               decoration: InputDecoration(
                   prefixIcon: Icon(Icons.lock),
-                  labelText: 'Password',
+                  labelText: 'Mật khẩu',
                   suffixIcon: IconButton(
                     icon: _obscureText
                         ? Icon(Icons.visibility_off)
@@ -251,7 +250,7 @@ class _MyLoginPageState extends State<MyLoginPage> {
               },
               // ignore: missing_return
               validator: (value) =>
-                  value.isEmpty ? "Please enter the password" : null,
+                  value.isEmpty ? "Bạn chưa nhập mật khẩu" : null,
               obscureText: _obscureText,
             ),
           ),
@@ -270,7 +269,7 @@ class _MyLoginPageState extends State<MyLoginPage> {
                       child: Padding(
                         padding: const EdgeInsets.all(6.0),
                         child: Text(
-                          'Login',
+                          'Đăng nhập',
                           style: TextStyle(fontSize: 18),
                         ),
                       ),
@@ -310,11 +309,11 @@ class _MyLoginPageState extends State<MyLoginPage> {
       } on FirebaseAuthException catch (e) {
         if (e.code == 'user-not-found') {
           setState(() {
-            _message = "User not found";
+            _message = "Tài khoản sai hoặc bạn chưa đăng ký tài khoản này";
           });
         } else if (e.code == 'wrong-password') {
           setState(() {
-            _message = "Wrong password";
+            _message = "Sai mật khẩu";
           });
         }
       }
@@ -322,7 +321,7 @@ class _MyLoginPageState extends State<MyLoginPage> {
       if (_message != null) _showAlertDialog(context, _message);
       _refreshPage();
     } else
-      _showAlertDialog(context, "No connection available");
+      _showAlertDialog(context, "Không có kết nối internet!");
   }
 
   // ignore: non_constant_identifier_names
@@ -342,7 +341,7 @@ class _MyLoginPageState extends State<MyLoginPage> {
       print("signed in " + user.displayName);
       _onSignIn();
     } else
-      _showAlertDialog(context, "No connection available");
+      _showAlertDialog(context, "Không có kết nối internet");
   }
 
   int _checkLogin() {
@@ -391,8 +390,7 @@ class _MyLoginPageState extends State<MyLoginPage> {
         content,
         style: TextStyle(color: Colors.red, fontSize: 18),
       ),
-      shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       actions: [
         FlatButton(onPressed: () => Navigator.pop(context), child: Text('Ok'))
       ],
