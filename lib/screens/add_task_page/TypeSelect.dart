@@ -71,7 +71,6 @@ class _SelectTypeState extends State<SelectType> {
                             .forEach((element) => element.isSelected = false);
                         buttonList[index].isSelected = true;
                         widget.selectedRepeat(buttonList[index].buttonText);
-                        _refreshPage();
                       },
                       elevation: 2.0,
                       fillColor: buttonList[index].isSelected

@@ -440,14 +440,14 @@ class _AddPageState extends State<AddPage> {
       else if (selectedDate == tomorrow)
         return 'Ngày mai lúc ${selectedTime.hour}:$minute';
       else
-        return '${selectedDate.day}/${selectedDate.month}/${selectedDate.year} at ${selectedTime.hour}:$minute';
+        return '${selectedDate.day}/${selectedDate.month}/${selectedDate.year} lúc ${selectedTime.hour}:$minute';
     } else if (_selectedType == "Repeat") {
       if (_typeRepeat == "Daily")
         return "Mỗi ngày lúc ${selectedTime.hour}:$minute";
       else if (_typeRepeat == "Weekly")
         return "Mỗi tuần vào $nameOfDayOfWeek lúc ${selectedTime.hour}:$minute";
       else if (_typeRepeat == "Period")
-        return "Lặp lại mỗi $periodTime ${timeUnit == "Minutes" ? "phút" : timeUnit == "Hours" ? "giờ" : timeUnit == "Days" ? "ngày" : ""} từ ${selectedTime.hour}:$minute";
+        return "Lặp lại mỗi $periodTime ${timeUnit == "Minutes" ? "phút" : timeUnit == "Hours" ? "giờ" : timeUnit == "Days" ? "ngày" : ""} từ ${selectedDate.day}/${selectedDate.month}/${selectedDate.year} lúc ${selectedTime.hour}:$minute";
     }
   }
 
@@ -565,11 +565,21 @@ class _AddPageState extends State<AddPage> {
     setState(() {
       timeUnit = newUnit;
     });
+    if (selectedDateTimeString != null)
+      setState(() {
+        selectedDateTimeString =
+            _textFromDateTime(_selectedDate, _selectedTime);
+      });
   }
 
   void changePeriodTime(newTime) {
     setState(() {
       periodTime = newTime;
     });
+    if (selectedDateTimeString != null)
+      setState(() {
+        selectedDateTimeString =
+            _textFromDateTime(_selectedDate, _selectedTime);
+      });
   }
 }
