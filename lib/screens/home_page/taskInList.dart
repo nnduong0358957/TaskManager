@@ -165,10 +165,7 @@ class _TaskInListState extends State<TaskInList> {
                     child: Switch(
                       value: widget.task["status"],
                       onChanged: (bool newValue) async {
-                        setState(() {
-                          widget.task["status"] = newValue;
-                        });
-                        changeStatus(widget.task, newValue);
+                        await changeStatus(widget.task, newValue);
                       },
                     ),
                   )

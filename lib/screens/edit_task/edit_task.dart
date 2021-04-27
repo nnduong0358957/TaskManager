@@ -36,7 +36,7 @@ class _EditPageState extends State<EditPage> {
   String selectedDateTimeString;
   DateTime _selectedDate;
   TimeOfDay _selectedTime;
-  int periodTime = 1;
+  int periodTime = 5;
   String timeUnit = "Minutes";
   List<String> listSubTask = List<String>();
   List<String> listNameOfDay = [
@@ -286,7 +286,7 @@ class _EditPageState extends State<EditPage> {
                             child: Padding(
                               padding: const EdgeInsets.all(6.0),
                               child: Text(
-                                'Thêm',
+                                'Xóa',
                                 style: GoogleFonts.lato(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w700,
@@ -649,7 +649,7 @@ class _EditPageState extends State<EditPage> {
             OutlineButton(
               onPressed: () => Navigator.pop(context),
               child: Padding(
-                padding: const EdgeInsets.only(left: 40, right: 40),
+                padding: const EdgeInsets.only(left: 20, right: 20),
                 child: Text('Hủy'),
               ),
               shape: RoundedRectangleBorder(
@@ -664,7 +664,7 @@ class _EditPageState extends State<EditPage> {
                   Navigator.pop(context);
                 },
                 child: Padding(
-                  padding: const EdgeInsets.only(left: 40, right: 40),
+                  padding: const EdgeInsets.only(left: 20, right: 20),
                   child: Text(
                     'Tiếp tục',
                     style: TextStyle(color: Colors.red),
@@ -701,7 +701,7 @@ class _EditPageState extends State<EditPage> {
             OutlineButton(
               onPressed: () => Navigator.pop(context),
               child: Padding(
-                padding: const EdgeInsets.only(left: 40, right: 40),
+                padding: const EdgeInsets.only(left: 20, right: 20),
                 child: Text('Hủy'),
               ),
               shape: RoundedRectangleBorder(
@@ -717,7 +717,7 @@ class _EditPageState extends State<EditPage> {
                   _refreshPage();
                 },
                 child: Padding(
-                  padding: const EdgeInsets.only(left: 40, right: 40),
+                  padding: const EdgeInsets.only(left: 20, right: 20),
                   child: Text(
                     'Xóa',
                     style: TextStyle(color: Colors.red),

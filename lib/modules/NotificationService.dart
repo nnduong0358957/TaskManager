@@ -103,8 +103,15 @@ class NotificationService extends ChangeNotifier {
       tz.TZDateTime notiTime = tz.TZDateTime.parse(tz.local, time);
       // Tạo một danh sách thời gian thông báo bắt đầu từ ngày được đặt
 
+      int listLength;
+      if (task["timeUnit"] == "Minutes")
+        listLength = 30;
+      else if (task["timeUnit"] == "Hours")
+        listLength = 24;
+      else if (task["timeUnit"] == "Minutes") listLength = 7;
+
       List<tz.TZDateTime> listNotiTime =
-          List<tz.TZDateTime>.generate(50, (index) {
+          List<tz.TZDateTime>.generate(listLength, (index) {
         if (index == 0)
           return notiTime;
         else if (task["timeUnit"] == "Minutes") {

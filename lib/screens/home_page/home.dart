@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:connectivity/connectivity.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -42,6 +44,7 @@ class _MyHomePageState extends State<MyHomePage> {
     "One Time": [],
     "Repeat": []
   };
+  Timer _timer;
 
   @override
   void initState() {

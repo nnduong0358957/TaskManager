@@ -118,6 +118,12 @@ class _SelectTypeState extends State<SelectType> {
                   value: widget.timeUnit,
                   onChanged: (String newValue) {
                     widget.changeTimeUnit(newValue);
+                    if (newValue == "Minutes" && int.parse(periodTimeController.text) < 5) {
+                      widget.changePeriodTime(int.parse("5"));
+                      setState(() {
+                        periodTimeController.text = "5";
+                      });
+                    }
                   },
                   underline: Container(
                     height: 2,
@@ -168,6 +174,12 @@ class _SelectTypeState extends State<SelectType> {
   TextField buildTextField() {
     return TextField(
       onChanged: (value) {
+        if (widget.timeUnit == "Minutes" && int.parse(value) < 5) {
+          value = "5";
+          setState(() {
+            periodTimeController.text = value;
+          });
+        }
         widget.changePeriodTime(int.parse(value));
       },
       controller: periodTimeController,

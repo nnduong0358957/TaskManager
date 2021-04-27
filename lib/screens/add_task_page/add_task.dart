@@ -34,7 +34,7 @@ class _AddPageState extends State<AddPage> {
   String selectedDateTimeString;
   DateTime _selectedDate;
   TimeOfDay _selectedTime;
-  int periodTime = 1;
+  int periodTime = 5;
   String timeUnit = "Minutes";
   List<String> listSubTask = List<String>();
   List<String> listNameOfDay = [
