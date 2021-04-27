@@ -127,7 +127,8 @@ class _MyHomePageState extends State<MyHomePage> {
                       child: Column(
                         children: [
                           ListExpansion(
-                              title: "Hôm nay", listTask: listCategory["Today"]),
+                              title: "Hôm nay",
+                              listTask: listCategory["Today"]),
                           ListExpansion(
                               title: "Ngày mai",
                               listTask: listCategory["Tomorrow"]),
@@ -600,7 +601,8 @@ class _MyHomePageState extends State<MyHomePage> {
   void remindTask(List<dynamic> listRemind) {
     listRemind.forEach((task) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        _showAlertDialog(context, "Bạn nên thực hiện ${task["title"]} bây giờ!");
+        _showAlertDialog(
+            context, "Bạn nên thực hiện ${task["title"]} bây giờ!");
       });
     });
   }
@@ -619,12 +621,11 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future initialTypeOfWork() async {
     List<String> listTag = [
-      "Priority",
-      "Important",
-      "Deadline",
-      "Family",
-      "Work",
-      "In Progress"
+      "Quan trọng",
+      "Hạn cuối",
+      "Gia đình",
+      "Công việc",
+      "Đang tiến hành"
     ];
     await ref
         .child("users/${widget.auth.currentUser.uid}/typeOfWork")
