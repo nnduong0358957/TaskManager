@@ -167,26 +167,35 @@ class _AppDrawerState extends State<AppDrawer> {
   ClipRRect buildContainerImage(double imgWidth, double imgHeight) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(1000),
-      child: Container(
-        width: imgWidth,
-        height: imgHeight,
-        child: _imageUrl != null
-            ? Image.network(
-                _imageUrl,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
-                  return Container(
-                      alignment: Alignment.center,
-                      color: Colors.white,
-                      child: Image.asset(
-                        "assets/images/loadImgFailed.png",
-                        width: 40,
-                        height: 40,
-                      ));
-                },
-              )
-            : Image.asset("assets/images/defaultImage.png"),
-      ),
+      child: _imageFile == null
+          ? Container(
+              width: imgWidth,
+              height: imgHeight,
+              child: _imageUrl != null
+                  ? Image.network(
+                      _imageUrl,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                            alignment: Alignment.center,
+                            color: Colors.white,
+                            child: Image.asset(
+                              "assets/images/loadImgFailed.png",
+                              width: 40,
+                              height: 40,
+                            ));
+                      },
+                    )
+                  : Image.asset("assets/images/defaultImage.png"),
+            )
+          : Container(
+              width: imgWidth,
+              height: imgHeight,
+              decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  image: DecorationImage(
+                      image: FileImage(_imageFile), fit: BoxFit.cover)),
+            ),
     );
   }
 
@@ -220,7 +229,8 @@ class _AppDrawerState extends State<AppDrawer> {
 
       await ref.putFile(_imageFile).whenComplete(() async {
         await ref.getDownloadURL().then((value) async {
-          deleteImgFile(_imageUrl);
+          if (getNameImg(value) != getNameImg(_imageUrl))
+            deleteImgFile(_imageUrl);
 
           setState(() {
             _imageUrl = value;
@@ -234,17 +244,22 @@ class _AppDrawerState extends State<AppDrawer> {
   }
 
   Future deleteImgFile(String path) async {
-    String fileName = path.replaceAll("/o/", "*");
-    fileName = fileName.replaceAll("?", "*");
-    fileName = fileName.split("*")[1];
-    fileName = fileName.replaceAll("%2F", "/");
+    String fileName = getNameImg(path);
 
-    print("$fileName");
     ref = firebase_storage.FirebaseStorage.instance.ref().child(fileName);
 
     await ref
         .delete()
         .then((_) => print('Successfully deleted $fileName storage item'));
+  }
+
+  String getNameImg(String path) {
+    String fileName = path.replaceAll("/o/", "*");
+    fileName = fileName.replaceAll("?", "*");
+    fileName = fileName.split("*")[1];
+    fileName = fileName.replaceAll("%2F", "/");
+
+    return fileName;
   }
 
   Future updateUserInfo(String displayName, String url) async {
@@ -318,7 +333,9 @@ class _AppDrawerState extends State<AppDrawer> {
                       padding: const EdgeInsets.only(left: 20.0),
                       child: OutlineButton(
                         onPressed: () async {
-                          await uploadFile();
+                          showLoaderDialog(context);
+                          await uploadFile()
+                              .whenComplete(() => Navigator.pop(context));
                           Navigator.pop(context);
                         },
                         child: Padding(
@@ -411,24 +428,7 @@ class _AppDrawerState extends State<AppDrawer> {
       setState(() {
         isConnected = false;
       });
-
-    // if (widget.auth.currentUser)
   }
-
-// BoxDecoration boxDecorationShowImg() {
-//   return new BoxDecoration(
-//       shape: BoxShape.circle,
-//       border: Border.all(color: Colors.blueAccent, width: 2),
-//       image: new DecorationImage(
-//           fit: BoxFit.cover,
-//           image: _imageFile != null
-//               ? FileImage(_imageFile)
-//               : _imageUrl != null
-//                   ? isConnected
-//                       ? NetworkImage(_imageUrl)
-//                       : AssetImage("assets/images/defaultImage.png")
-//                   : AssetImage("assets/images/loadImgFailed.png")));
-// }
 
 // Form dialog Yes, No
   void _showDeleteYesNoDialog(BuildContext context, String title,
@@ -482,6 +482,25 @@ class _AppDrawerState extends State<AppDrawer> {
     showDialog(
       context: context,
       builder: (context) => alertDialog,
+    );
+  }
+
+  showLoaderDialog(BuildContext context) {
+    AlertDialog alert = AlertDialog(
+      content: new Row(
+        children: [
+          CircularProgressIndicator(),
+          Container(
+              margin: EdgeInsets.only(left: 7), child: Text("Loading...")),
+        ],
+      ),
+    );
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
     );
   }
 }

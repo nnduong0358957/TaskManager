@@ -102,30 +102,31 @@ class NotificationService extends ChangeNotifier {
       final tz.TZDateTime now = tz.TZDateTime.now(tz.local);
       tz.TZDateTime notiTime = tz.TZDateTime.parse(tz.local, time);
       // Tạo một danh sách thời gian thông báo bắt đầu từ ngày được đặt
-      if (now.isBefore(notiTime)) {
-        List<tz.TZDateTime> listNotiTime =
-            List<tz.TZDateTime>.generate(50, (index) {
-          if (index == 0)
-            return notiTime;
-          else if (task["timeUnit"] == "Minutes") {
-            notiTime = notiTime.add(Duration(minutes: task["periodTime"]));
-          } else if (task["timeUnit"] == "Hours") {
-            notiTime = notiTime.add(Duration(hours: task["periodTime"]));
-          } else if (task["timeUnit"] == "Days") {
-            notiTime = notiTime.add(Duration(days: task["periodTime"]));
-          }
-          return notiTime;
-        });
 
-        listNotiTime.asMap().forEach((index, notificationTime) async {
+      List<tz.TZDateTime> listNotiTime =
+          List<tz.TZDateTime>.generate(50, (index) {
+        if (index == 0)
+          return notiTime;
+        else if (task["timeUnit"] == "Minutes") {
+          notiTime = notiTime.add(Duration(minutes: task["periodTime"]));
+        } else if (task["timeUnit"] == "Hours") {
+          notiTime = notiTime.add(Duration(hours: task["periodTime"]));
+        } else if (task["timeUnit"] == "Days") {
+          notiTime = notiTime.add(Duration(days: task["periodTime"]));
+        }
+        return notiTime;
+      });
+
+      listNotiTime.asMap().forEach((index, notificationTime) async {
+        if (now.isBefore(notificationTime)) {
           await _flutterLocalNotificationsPlugin.zonedSchedule(
               id + index, title, body, notificationTime, platform,
               payload: payload,
               androidAllowWhileIdle: true,
               uiLocalNotificationDateInterpretation:
-                  UILocalNotificationDateInterpretation.absoluteTime);
-        });
-      }
+              UILocalNotificationDateInterpretation.absoluteTime);
+        }
+      });
     }
   }
 

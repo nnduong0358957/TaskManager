@@ -290,13 +290,20 @@ class _MyHomePageState extends State<MyHomePage> {
         while (now.isAfter(taskDateTime)) {
           // Đưa task date đến ngày thông báo gần nhất
           if (task["timeUnit"] == "Minutes") {
-            taskDateTime =
-                taskDateTime.add(Duration(minutes: task["periodTime"]));
+            setState(() {
+              taskDateTime =
+                  taskDateTime.add(Duration(minutes: task["periodTime"]));
+            });
           } else if (task["timeUnit"] == "Hours") {
-            taskDateTime =
-                taskDateTime.add(Duration(hours: task["periodTime"]));
+            setState(() {
+              taskDateTime =
+                  taskDateTime.add(Duration(hours: task["periodTime"]));
+            });
           } else if (task["timeUnit"] == "Days") {
-            taskDateTime = taskDateTime.add(Duration(days: task["periodTime"]));
+            setState(() {
+              taskDateTime =
+                  taskDateTime.add(Duration(days: task["periodTime"]));
+            });
           }
         }
       }
