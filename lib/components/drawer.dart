@@ -259,8 +259,10 @@ class _AppDrawerState extends State<AppDrawer> {
   String getNameImg(String path) {
     String fileName = path.replaceAll("/o/", "*");
     fileName = fileName.replaceAll("?", "*");
-    fileName = fileName.split("*")[1];
-    fileName = fileName.replaceAll("%2F", "/");
+    if (fileName.contains("*")) {
+      fileName = fileName.split("*")[1];
+      fileName = fileName.replaceAll("%2F", "/");
+    }
 
     return fileName;
   }
@@ -337,9 +339,10 @@ class _AppDrawerState extends State<AppDrawer> {
                       child: OutlineButton(
                         onPressed: () async {
                           showLoaderDialog(context);
-                          await uploadFile()
-                              .whenComplete(() => Navigator.pop(context));
-                          Navigator.pop(context);
+                          await uploadFile().whenComplete(() {
+                            Navigator.pop(context);
+                            Navigator.pop(context);
+                          });
                         },
                         child: Padding(
                           padding: const EdgeInsets.only(left: 20, right: 20),
