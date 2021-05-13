@@ -41,6 +41,7 @@ class _MyHomePageState extends State<MyHomePage> {
     "Today": [],
     "Tomorrow": [],
     "Upcoming": [],
+    "Past": [],
     "One Time": [],
     "Repeat": []
   };
@@ -136,6 +137,10 @@ class _MyHomePageState extends State<MyHomePage> {
                             title: "Sắp đến",
                             listTask: listCategory["Upcoming"],
                           ),
+                          ListExpansion(
+                            title: "Đã qua",
+                            listTask: listCategory["Past"],
+                          ),
                           SizedBox(
                             height: 200,
                           ),
@@ -202,6 +207,7 @@ class _MyHomePageState extends State<MyHomePage> {
       List listToday = [],
           listTomorrow = [],
           listUpcoming = [],
+          listPast = [],
           listOneTime = [],
           listRepeat = [];
       Map<dynamic, dynamic> values = dataSnapshot.value;
@@ -236,8 +242,8 @@ class _MyHomePageState extends State<MyHomePage> {
           }
         });
 
-        sortList(
-            listToday, listTomorrow, listUpcoming, listOneTime, listRepeat);
+        sortList(listToday, listTomorrow, listUpcoming, listPast, listOneTime,
+            listRepeat);
       }
 
       setState(() {
@@ -323,20 +329,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
     //Cập nhật lại ngày thông báo của loại thông báo lặp lại (Repeat)
     if (task["typeAlarm"] == "Repeat" &&
-        task["isShow"] == false &&
         task["isMiss"] == true) {
-      // Reset sau khi thông báo bị MISS
-      if (task["isAlertMiss"] == true) {
-        await ref.child(path).child(task["key"]).update({
-          "dateTime": taskDateTime.toString(),
-          "isShow": false,
-          "isMiss": true,
-          "isAlertMiss": false,
-          "isAlertRemind": false
-        });
-      } else
-      // Reset sau khi nhận được thông báo remind
-      if (task["isAlertRemind"] == true) {
+      // Reset sau khi thông báo bị MISS hay đã nhận được
+      if (task["isAlertMiss"] == true || task["isAlertRemind"] == true) {
         await ref.child(path).child(task["key"]).update({
           "dateTime": taskDateTime.toString(),
           "isShow": false,
@@ -429,6 +424,7 @@ class _MyHomePageState extends State<MyHomePage> {
       List<dynamic> listToday,
       List<dynamic> listTomorrow,
       List<dynamic> listUpcoming,
+      List<dynamic> listPast,
       List<dynamic> listOneTime,
       List<dynamic> listRepeat) {
     // listTask.sort((b, a) => a['title'].toLowerCase().compareTo(b['title'].toLowerCase()));
@@ -451,8 +447,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
       if (taskDate == dateNow) listToday.add(element);
       if (taskDate == tomorrow) listTomorrow.add(element);
-      if (taskDate != dateNow && taskDate != tomorrow)
+      if (taskDate != dateNow && taskDate != tomorrow && dateTime.isAfter(now))
         listUpcoming.add(element);
+      if (dateTime.isBefore(now)) listPast.add(element);
 
       if (element["typeAlarm"] == "One Time")
         listOneTime.add(element);
@@ -463,6 +460,7 @@ class _MyHomePageState extends State<MyHomePage> {
     listCategory["Today"] = listToday;
     listCategory["Tomorrow"] = listTomorrow;
     listCategory["Upcoming"] = listUpcoming;
+    listCategory["Past"] = listPast;
     listCategory["One Time"] = listOneTime;
     listCategory["Repeat"] = listRepeat;
   }

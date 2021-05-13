@@ -50,7 +50,7 @@ class _TableCalendarWithEventsState extends State<TableCalendarWithEvents> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           TableCalendar(
-            firstDay: kNow,
+            firstDay: DateTime(kNow.year - 1, kNow.month, kNow.day),
             lastDay: DateTime(
                 kNow.year + 2, kNow.month, kNow.day, kNow.hour, kNow.minute),
             focusedDay: _focusedDay,
@@ -183,9 +183,7 @@ class _TableCalendarWithEventsState extends State<TableCalendarWithEvents> {
           eDateTime.month,
           eDateTime.day,
         );
-        if (e["status"] == true &&
-            e["isDone"] != true &&
-            eDate.isAtSameMomentAs(testDate)) {
+        if (eDate.isAtSameMomentAs(testDate)) {
           listEvent.add(e["key"]);
         }
       });

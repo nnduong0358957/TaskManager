@@ -32,7 +32,7 @@ class _ListExpansionState extends State<ListExpansion> {
             expansionStatus = value;
           });
         },
-        backgroundColor: Colors.blue[50],
+        backgroundColor: Colors.white,
         leading: CircleAvatar(
             backgroundColor: Colors.black.withOpacity(.07),
             child: Icon(
@@ -52,9 +52,7 @@ class _ListExpansionState extends State<ListExpansion> {
         title: Text(
           widget.title,
           style: GoogleFonts.lato(
-              fontSize: 20,
-              fontWeight: FontWeight.w700,
-              color: kPrimaryColor),
+              fontSize: 20, fontWeight: FontWeight.w700, color: kPrimaryColor),
         ),
         expandedAlignment: Alignment.topLeft,
         children: [
