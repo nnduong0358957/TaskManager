@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:implicitly_animated_reorderable_list/implicitly_animated_reorderable_list.dart';
 import 'package:multi_select_flutter/multi_select_flutter.dart';
 import 'package:todo_list_app/components/type_of_work/dialogTypeOfWork.dart';
-import 'package:todo_list_app/modules/task.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:todo_list_app/screens/home_page/taskInList.dart';
 import 'package:collection/collection.dart';
+import 'package:todo_list_app/constants.dart';
 
 class FindByTags extends StatefulWidget {
   FindByTags({this.listTask, this.typeOfWork, this.refreshPage});
@@ -17,6 +18,7 @@ class FindByTags extends StatefulWidget {
 }
 
 class _FindByTagsState extends State<FindByTags> {
+  final SlidableController slidableController = SlidableController();
   List<dynamic> _listSelectedTag = [];
   List<dynamic> _listTaskFound = [];
 
@@ -92,27 +94,55 @@ class _FindByTagsState extends State<FindByTags> {
           ),
           // Specify the generic type of the data in the list.
           // Specify the generic type of the data in the list.
-          ImplicitlyAnimatedList<dynamic>(
-            shrinkWrap: true,
-            physics: NeverScrollableScrollPhysics(),
-            // The current items in the list.
-            items: _listTaskFound,
-            insertDuration: Duration(seconds: 1),
-            removeDuration: Duration(seconds: 1),
-            updateDuration: Duration(seconds: 1),
-            areItemsTheSame: (a, b) => a["key"] == b["key"],
-            itemBuilder: (context, animation, item, index) {
-              return SlideTransition(
-                  position: animation.drive(
-                      Tween<Offset>(begin: Offset(1, 0), end: Offset(0, 0))
-                          .chain(CurveTween(curve: Curves.easeInOutBack))),
-                  child: TaskInList(task: _listTaskFound[index]));
-            },
-            removeItemBuilder: (context, animation, oldItem) {
-              return FadeTransition(
-                  opacity: animation, child: TaskInList(task: oldItem));
-            },
-          ),
+          _listTaskFound.length == 0
+              ? Padding(
+                padding: const EdgeInsets.only(left: 16.0),
+                child: Text('Không có công việc'),
+              )
+              : ImplicitlyAnimatedList<dynamic>(
+                  shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(),
+                  // The current items in the list.
+                  items: _listTaskFound,
+                  insertDuration: Duration(seconds: 1),
+                  removeDuration: Duration(seconds: 1),
+                  updateDuration: Duration(seconds: 1),
+                  areItemsTheSame: (a, b) => a["key"] == b["key"],
+                  itemBuilder: (context, animation, item, index) {
+                    return SlideTransition(
+                        position: animation.drive(Tween<Offset>(
+                                begin: Offset(1, 0), end: Offset(0, 0))
+                            .chain(CurveTween(curve: Curves.easeInOutBack))),
+                        child: Slidable(
+                          child: TaskInList(task: _listTaskFound[index]),
+                          key: Key(item['key']),
+                          controller: slidableController,
+                          actionPane: SlidableDrawerActionPane(),
+                          actionExtentRatio: 0.25,
+                          secondaryActions: [
+                            SlideAction(
+                              color: Color(0xFFE2E2EA),
+                              child: Text(
+                                item["status"] ? 'Tắt' : 'Bật',
+                                style: TextStyle(
+                                    color: item["status"]
+                                        ? Colors.red[300]
+                                        : Colors.green[600],
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 18),
+                              ),
+                              onTap: () async {
+                                await changeStatus(item, !item["status"]);
+                              },
+                            ),
+                          ],
+                        ));
+                  },
+                  removeItemBuilder: (context, animation, oldItem) {
+                    return FadeTransition(
+                        opacity: animation, child: TaskInList(task: oldItem));
+                  },
+                ),
           SizedBox(
             height: 200,
           ),

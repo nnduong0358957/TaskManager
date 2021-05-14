@@ -3,9 +3,11 @@ import 'dart:collection';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:implicitly_animated_reorderable_list/implicitly_animated_reorderable_list.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:todo_list_app/constants.dart';
 import 'package:todo_list_app/screens/home_page/taskInList.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 
 class TableCalendarWithEvents extends StatefulWidget {
   TableCalendarWithEvents({this.listTask});
@@ -18,6 +20,8 @@ class TableCalendarWithEvents extends StatefulWidget {
 }
 
 class _TableCalendarWithEventsState extends State<TableCalendarWithEvents> {
+  final SlidableController slidableController = SlidableController();
+
   Map<DateTime, List<dynamic>> eventSource;
   Map<DateTime, List<dynamic>> events;
   ValueNotifier<List<dynamic>> _selectedEvents;
@@ -56,7 +60,11 @@ class _TableCalendarWithEventsState extends State<TableCalendarWithEvents> {
             focusedDay: _focusedDay,
             calendarStyle: CalendarStyle(
                 weekendTextStyle: TextStyle(color: Colors.red),
-                defaultTextStyle: TextStyle(color: kPrimaryColor)),
+                defaultTextStyle: TextStyle(color: kPrimaryColor),
+                todayDecoration: BoxDecoration(
+                    color: Colors.yellow[800], shape: BoxShape.circle),
+                selectedDecoration: BoxDecoration(
+                    color: Colors.green[500], shape: BoxShape.circle)),
             selectedDayPredicate: (day) {
               return isSameDay(_selectedDay, day);
             },
@@ -112,12 +120,57 @@ class _TableCalendarWithEventsState extends State<TableCalendarWithEvents> {
                       child: ValueListenableBuilder<List<dynamic>>(
                         valueListenable: _selectedEvents,
                         builder: (context, value, _) {
-                          return ListView.builder(
-                            physics: NeverScrollableScrollPhysics(),
+                          var listTaskEvents = [];
+                          widget.listTask.forEach((task) {
+                            if (value.contains(task['key']))
+                              listTaskEvents.add(task);
+                          });
+                          return ImplicitlyAnimatedList<dynamic>(
                             shrinkWrap: true,
-                            itemCount: value.length,
-                            itemBuilder: (context, index) {
-                              return buildTaskInList(value[index]);
+                            physics: NeverScrollableScrollPhysics(),
+                            // The current items in the list.
+                            items: listTaskEvents,
+                            insertDuration: Duration(seconds: 0),
+                            removeDuration: Duration(milliseconds: 600),
+                            updateDuration: Duration(seconds: 1),
+                            areItemsTheSame: (a, b) => a["key"] == b["key"],
+                            itemBuilder: (context, animation, item, index) {
+                              return SlideTransition(
+                                  position: animation.drive(Tween<Offset>(
+                                          begin: Offset(1, 0),
+                                          end: Offset(0, 0))
+                                      .chain(CurveTween(
+                                          curve: Curves.easeInOutBack))),
+                                  child: Slidable(
+                                    child: TaskInList(task: item),
+                                    key: Key(item['key']),
+                                    controller: slidableController,
+                                    actionPane: SlidableDrawerActionPane(),
+                                    actionExtentRatio: 0.25,
+                                    secondaryActions: [
+                                      SlideAction(
+                                        color: Color(0xFFE2E2EA),
+                                        child: Text(
+                                          item["status"] ? 'Tắt' : 'Bật',
+                                          style: TextStyle(
+                                              color: item["status"]
+                                                  ? Colors.red[300]
+                                                  : Colors.green[600],
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 18),
+                                        ),
+                                        onTap: () async {
+                                          await changeStatus(
+                                              item, !item["status"]);
+                                        },
+                                      ),
+                                    ],
+                                  ));
+                            },
+                            removeItemBuilder: (context, animation, oldItem) {
+                              return FadeTransition(
+                                  opacity: animation,
+                                  child: TaskInList(task: oldItem));
                             },
                           );
                         },
@@ -132,21 +185,6 @@ class _TableCalendarWithEventsState extends State<TableCalendarWithEvents> {
         ],
       ),
     );
-  }
-
-  Widget buildTaskInList(value) {
-    Map<String, dynamic> taskSelect;
-    widget.listTask.forEach((task) {
-      if (task["key"] == value) {
-        taskSelect = task;
-      }
-    });
-    if (taskSelect == null)
-      return Text("No events");
-    else
-      return TaskInList(
-        task: taskSelect,
-      );
   }
 
   void _onDaySelected(DateTime selectedDay, DateTime focusedDay) {

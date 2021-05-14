@@ -21,9 +21,10 @@ class _SubTitleState extends State<SubTitle> {
               alignment: Alignment.topLeft,
               scale: 0.9,
               child: Chip(
+                backgroundColor: Colors.blue[300],
                   label: Text(
                 e,
-                style: TextStyle(fontSize: 10),
+                style: TextStyle(fontSize: 10, color: Colors.white),
               )),
             );
           })

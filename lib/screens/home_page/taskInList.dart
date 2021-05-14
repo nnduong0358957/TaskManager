@@ -1,9 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import 'package:todo_list_app/constants.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:todo_list_app/screens/edit_task/edit_task.dart';
 import 'package:todo_list_app/screens/home_page/subTitle.dart';
+import 'package:todo_list_app/constants.dart';
 
 class TaskInList extends StatefulWidget {
   TaskInList({this.task});
@@ -17,6 +18,7 @@ class TaskInList extends StatefulWidget {
 class _TaskInListState extends State<TaskInList> {
   final ref = FirebaseDatabase.instance.reference();
   final FirebaseAuth auth = FirebaseAuth.instance;
+  final SlidableController slidableController = SlidableController();
 
   bool _refresh = false;
 
@@ -41,59 +43,75 @@ class _TaskInListState extends State<TaskInList> {
         if (widget.task["isDone"] == false)
           Navigator.of(context).push(_editRoute(widget.task));
       },
-      title: Container(
-        padding: EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          color: Color(0xFFE2E2EA),
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey,
-              blurRadius: 1.0,
-              spreadRadius: 0.0,
-              offset: Offset(2.0, 2.0), // shadow direction: bottom right
-            )
-          ],
-        ),
-        child: Opacity(
-          opacity: widget.task["status"] ? 1 : 0.5,
-          child: IntrinsicHeight(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                buildTimeField(time),
-                VerticalDivider(
-                  thickness: 2,
-                  width: 1,
-                  color: Colors.grey.withOpacity(0.6),
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+      title: ClipPath(
+        clipper: ShapeBorderClipper(
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(20)))),
+        child: Container(
+          padding: EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: Color(0xFFE2E2EA),
+            border: Border(
+              right: BorderSide(
+                  width: 16.0,
+                  color: widget.task['status']
+                      ? Colors.green[600]
+                      : Colors.red[300]),
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey,
+                blurRadius: 1.0,
+                spreadRadius: 0.0,
+                offset: Offset(2.0, 2.0), // shadow direction: bottom right
+              )
+            ],
+          ),
+          child: ConstrainedBox(
+            constraints: new BoxConstraints(
+              minHeight: 50.0,
+            ),
+            child: Opacity(
+              opacity: widget.task["status"] ? 1 : 0.5,
+              child: IntrinsicHeight(
+                child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    buildTitle(size),
-                    widget.task["content"] != ""
-                        ? Row(
-                            children: [
-                              widget.task["content"] == ""
-                                  ? SizedBox()
-                                  : Icon(Icons.assignment_outlined),
-                              SizedBox(width: 5),
-                              Container(
-                                  width: size.width - 200,
-                                  child: Text(
-                                    widget.task["content"],
-                                    overflow: TextOverflow.ellipsis,
-                                  )),
-                            ],
-                          )
-                        : Container(),
-                    Container(
-                        width: size.width - 180,
-                        child: SubTitle(listTag: listTag))
+                    buildTimeField(time),
+                    VerticalDivider(
+                      thickness: 2,
+                      width: 1,
+                      color: Colors.grey.withOpacity(0.6),
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        buildTitle(size),
+                        widget.task["content"] != ""
+                            ? Row(
+                                children: [
+                                  widget.task["content"] == ""
+                                      ? SizedBox()
+                                      : Icon(Icons.assignment_outlined),
+                                  SizedBox(width: 5),
+                                  Container(
+                                      width: size.width - 200,
+                                      child: Text(
+                                        widget.task["content"],
+                                        overflow: TextOverflow.ellipsis,
+                                      )),
+                                ],
+                              )
+                            : Container(),
+                        Container(
+                            width: size.width - 180,
+                            child: SubTitle(listTag: listTag))
+                      ],
+                    ),
                   ],
-                )
-              ],
+                ),
+              ),
             ),
           ),
         ),
@@ -103,6 +121,7 @@ class _TaskInListState extends State<TaskInList> {
 
   Container buildTimeField(String time) {
     return Container(
+      margin: EdgeInsets.only(right: 10),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -144,9 +163,10 @@ class _TaskInListState extends State<TaskInList> {
     return Container(
         width: size.width - 160,
         child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Container(
-              width: size.width - 240,
+              width: size.width - 210,
               child: Text(
                 widget.task["title"],
                 overflow: TextOverflow.ellipsis,
@@ -160,19 +180,11 @@ class _TaskInListState extends State<TaskInList> {
               ),
             ),
             widget.task["isDone"] == false
-                ? Transform.scale(
-                    scale: 1.4,
-                    child: Switch(
-                      value: widget.task["status"],
-                      onChanged: (bool newValue) async {
-                        await changeStatus(widget.task, newValue);
-                      },
-                    ),
-                  )
+                ? Container()
                 : IconButton(
                     icon: Icon(
                       Icons.cancel,
-                      size: 36,
+                      size: 30,
                     ),
                     onPressed: () {
                       _deleteTask(widget.task["key"]);
@@ -215,34 +227,6 @@ class _TaskInListState extends State<TaskInList> {
         );
       },
     );
-  }
-
-  Future changeStatus(Map<String, dynamic> task, bool newValue) async {
-    final path = "users/${auth.currentUser.uid}/tasks";
-    DateTime now = DateTime.now();
-    DateTime taskDateTime = DateTime.parse(task["dateTime"]);
-
-    // Nếu bật lại task thuộc loại OneTime thì đặt cho nó thời gian trước thời
-    // gian bây giờ để tránh bị lỗi (thời gian thông báo ở quá khứ)
-    if (newValue && task["typeAlarm"] == "One Time") {
-      DateTime newDateTime = DateTime(
-          now.year, now.month, now.day, taskDateTime.hour, taskDateTime.minute);
-      if (newDateTime.isBefore(now)) {
-        newDateTime = newDateTime.add(Duration(days: 1));
-      }
-      await ref
-          .child(path)
-          .child(task["key"])
-          .update({"dateTime": newDateTime.toString(), "status": newValue});
-    }
-
-    await ref.child(path).child(task["key"]).update({
-      "status": newValue,
-      "isMiss": true,
-      "isShow": false,
-      "isAlertMiss": true,
-      "isAlertRemind": true
-    });
   }
 
   Future checkDone(Map<String, dynamic> task) async {
