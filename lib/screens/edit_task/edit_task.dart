@@ -233,7 +233,6 @@ class _EditPageState extends State<EditPage> {
                       ),
                       SetTimeButton(
                           selectedDateTimeString: selectedDateTimeString,
-                          ChangeSelectedTime: _ChangeSelectedTime,
                           selectTimeAlert: _selectTimeAlert),
                       SelectedDateOnOff(
                           selectedDateTimeString: selectedDateTimeString,

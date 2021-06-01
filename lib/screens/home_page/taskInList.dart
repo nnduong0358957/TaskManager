@@ -43,74 +43,74 @@ class _TaskInListState extends State<TaskInList> {
         if (widget.task["isDone"] == false)
           Navigator.of(context).push(_editRoute(widget.task));
       },
-      title: ClipPath(
-        clipper: ShapeBorderClipper(
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(20)))),
-        child: Container(
-          padding: EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: Color(0xFFE2E2EA),
-            border: Border(
-              right: BorderSide(
-                  width: 16.0,
-                  color: widget.task['status']
-                      ? Colors.green[600]
-                      : Colors.red[300]),
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey,
-                blurRadius: 1.0,
-                spreadRadius: 0.0,
-                offset: Offset(2.0, 2.0), // shadow direction: bottom right
-              )
-            ],
-          ),
-          child: ConstrainedBox(
-            constraints: new BoxConstraints(
-              minHeight: 50.0,
-            ),
-            child: Opacity(
-              opacity: widget.task["status"] ? 1 : 0.5,
-              child: IntrinsicHeight(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    buildTimeField(time),
-                    VerticalDivider(
-                      thickness: 2,
-                      width: 1,
-                      color: Colors.grey.withOpacity(0.6),
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        buildTitle(size),
-                        widget.task["content"] != ""
-                            ? Row(
-                                children: [
-                                  widget.task["content"] == ""
-                                      ? SizedBox()
-                                      : Icon(Icons.assignment_outlined),
-                                  SizedBox(width: 5),
-                                  Container(
-                                      width: size.width - 200,
-                                      child: Text(
-                                        widget.task["content"],
-                                        overflow: TextOverflow.ellipsis,
-                                      )),
-                                ],
-                              )
-                            : Container(),
-                        Container(
-                            width: size.width - 180,
-                            child: SubTitle(listTag: listTag))
-                      ],
-                    ),
+      title: Container(
+        padding: EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          gradient: widget.task["status"]
+              ? LinearGradient(
+                  colors: [
+                    const Color(0xFFBCC6FF),
+                    const Color(0xFFF1F7FF),
                   ],
-                ),
+                  begin: const FractionalOffset(0.0, 2.0),
+                  end: const FractionalOffset(3.0, 0.0),
+                  stops: [0.0, 1.0],
+                  tileMode: TileMode.clamp)
+              : null,
+          color: Color(0xFFE2E2EA),
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey,
+              blurRadius: 1.0,
+              spreadRadius: 0.0,
+              offset: Offset(2.0, 2.0), // shadow direction: bottom right
+            )
+          ],
+        ),
+        child: ConstrainedBox(
+          constraints: new BoxConstraints(
+            minHeight: 50.0,
+          ),
+          child: Opacity(
+            opacity: widget.task["status"] ? 1 : 0.5,
+            child: IntrinsicHeight(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  buildTimeField(time),
+                  VerticalDivider(
+                    thickness: 2,
+                    width: 1,
+                    color: Colors.black.withOpacity(0.6),
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      buildTitle(size),
+                      widget.task["content"] != ""
+                          ? Row(
+                              children: [
+                                widget.task["content"] == ""
+                                    ? SizedBox()
+                                    : Icon(Icons.assignment_outlined),
+                                SizedBox(width: 5),
+                                Container(
+                                    width: size.width - 200,
+                                    child: Text(
+                                      widget.task["content"],
+                                      overflow: TextOverflow.ellipsis,
+                                    )),
+                              ],
+                            )
+                          : Container(),
+                      Container(
+                          width: size.width - 180,
+                          child: SubTitle(listTag: listTag))
+                    ],
+                  ),
+                ],
               ),
             ),
           ),

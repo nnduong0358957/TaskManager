@@ -186,7 +186,6 @@ class _AddPageState extends State<AddPage> {
                     ),
                     SetTimeButton(
                         selectedDateTimeString: selectedDateTimeString,
-                        ChangeSelectedTime: _ChangeSelectedTime,
                         selectTimeAlert: _selectTimeAlert),
                     SelectedDateOnOff(
                         selectedDateTimeString: selectedDateTimeString,

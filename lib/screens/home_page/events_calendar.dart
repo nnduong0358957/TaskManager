@@ -21,6 +21,7 @@ class TableCalendarWithEvents extends StatefulWidget {
 
 class _TableCalendarWithEventsState extends State<TableCalendarWithEvents> {
   final SlidableController slidableController = SlidableController();
+  RangeSelectionMode _rangeSelectionMode = RangeSelectionMode.toggledOff;
 
   Map<DateTime, List<dynamic>> eventSource;
   Map<DateTime, List<dynamic>> events;
@@ -30,7 +31,7 @@ class _TableCalendarWithEventsState extends State<TableCalendarWithEvents> {
 
   CalendarFormat _calendarFormat = CalendarFormat.month;
   DateTime _focusedDay = DateTime.now();
-  DateTime _selectedDay;
+  DateTime _selectedDay, _rangeStart, _rangeEnd;
 
   @override
   void initState() {
@@ -58,6 +59,9 @@ class _TableCalendarWithEventsState extends State<TableCalendarWithEvents> {
             lastDay: DateTime(
                 kNow.year + 2, kNow.month, kNow.day, kNow.hour, kNow.minute),
             focusedDay: _focusedDay,
+            rangeStartDay: _rangeStart,
+            rangeEndDay: _rangeEnd,
+            rangeSelectionMode: _rangeSelectionMode,
             calendarStyle: CalendarStyle(
                 weekendTextStyle: TextStyle(color: Colors.red),
                 defaultTextStyle: TextStyle(color: kPrimaryColor),
@@ -69,6 +73,7 @@ class _TableCalendarWithEventsState extends State<TableCalendarWithEvents> {
               return isSameDay(_selectedDay, day);
             },
             onDaySelected: _onDaySelected,
+            onRangeSelected: _onRangeSelected,
             calendarFormat: _calendarFormat,
             onFormatChanged: (format) {
               setState(() {
@@ -190,15 +195,54 @@ class _TableCalendarWithEventsState extends State<TableCalendarWithEvents> {
   void _onDaySelected(DateTime selectedDay, DateTime focusedDay) {
     if (!isSameDay(_selectedDay, selectedDay)) {
       setState(() {
+        _rangeEnd = null;
+        _rangeStart = null;
         _focusedDay = focusedDay;
         _selectedDay = selectedDay;
         _selectedEvents.value = _getEventsForDay(selectedDay);
+        _rangeSelectionMode = RangeSelectionMode.toggledOff;
       });
+    }
+  }
+
+  void _onRangeSelected(start, end, focusedDay) {
+    setState(() {
+      _selectedDay = null;
+      _focusedDay = focusedDay;
+      _rangeStart = start;
+      _rangeEnd = end;
+      _rangeSelectionMode = RangeSelectionMode.toggledOn;
+    });
+    if (start != null && end != null) {
+      _selectedEvents.value = _getEventsForRange(start, end);
+    } else if (start != null) {
+      _selectedEvents.value = _getEventsForDay(start);
+    } else if (end != null) {
+      _selectedEvents.value = _getEventsForDay(end);
     }
   }
 
   List<dynamic> _getEventsForDay(DateTime day) {
     return events[day] ?? [];
+  }
+
+  List<dynamic> _getEventsForDays(Iterable<DateTime> days) {
+    return [
+      for (final d in days) ..._getEventsForDay(d),
+    ];
+  }
+
+  List<DateTime> daysInRange(DateTime first, DateTime last) {
+    final dayCount = last.difference(first).inDays + 1;
+    return List.generate(
+      dayCount,
+      (index) => DateTime.utc(first.year, first.month, first.day + index),
+    );
+  }
+
+  List<dynamic> _getEventsForRange(DateTime start, DateTime end) {
+    final days = daysInRange(start, end);
+    return _getEventsForDays(days);
   }
 
   int getHashCode(DateTime key) {
@@ -233,6 +277,8 @@ class _TableCalendarWithEventsState extends State<TableCalendarWithEvents> {
       hashCode: getHashCode,
     )..addAll(eventSource);
 
-    _selectedEvents = ValueNotifier(_getEventsForDay(_selectedDay));
+    if (_selectedDay != null) {
+      _selectedEvents = ValueNotifier(_getEventsForDay(_selectedDay));
+    }
   }
 }
