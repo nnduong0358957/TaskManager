@@ -85,6 +85,7 @@ class _FindByTagsState extends State<FindByTags> {
             child: Align(
               alignment: Alignment.bottomRight,
               child: DialogTypeOfWork(
+                  listTask: widget.listTask,
                   typeOfWork: widget.typeOfWork,
                   refreshPage: widget.refreshPage),
             ),
@@ -96,9 +97,9 @@ class _FindByTagsState extends State<FindByTags> {
           // Specify the generic type of the data in the list.
           _listTaskFound.length == 0
               ? Padding(
-                padding: const EdgeInsets.only(left: 16.0),
-                child: Text('Không có công việc'),
-              )
+                  padding: const EdgeInsets.only(left: 16.0),
+                  child: Text('Không có công việc'),
+                )
               : ImplicitlyAnimatedList<dynamic>(
                   shrinkWrap: true,
                   physics: NeverScrollableScrollPhysics(),

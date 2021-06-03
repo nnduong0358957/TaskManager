@@ -88,7 +88,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         icon: Icon(Icons.repeat),
                       ),
                       Tab(
-                        icon: Icon(Icons.work_outlined),
+                        icon: Icon(Icons.search),
                       ),
                     ],
                   ),
@@ -234,7 +234,8 @@ class _MyHomePageState extends State<MyHomePage> {
             "isMiss": value["isMiss"],
             "isShow": value["isShow"],
             "isAlertMiss": value["isAlertMiss"],
-            "isAlertRemind": value["isAlertRemind"]
+            "isAlertRemind": value["isAlertRemind"],
+            "listTimeNotificationPeriod": value["listTimeNotificationPeriod"]
           };
 
           if (value["isDeleted"] == false) {
@@ -328,8 +329,7 @@ class _MyHomePageState extends State<MyHomePage> {
     }
 
     //Cập nhật lại ngày thông báo của loại thông báo lặp lại (Repeat)
-    if (task["typeAlarm"] == "Repeat" &&
-        task["isMiss"] == true) {
+    if (task["typeAlarm"] == "Repeat" && task["isMiss"] == true) {
       // Reset sau khi thông báo bị MISS hay đã nhận được
       if (task["isAlertMiss"] == true || task["isAlertRemind"] == true) {
         await ref.child(path).child(task["key"]).update({
@@ -465,9 +465,9 @@ class _MyHomePageState extends State<MyHomePage> {
     listCategory["Repeat"] = listRepeat;
   }
 
-  void notification() {
-    NotificationService().initialize(listTask);
-    NotificationService().cancelNotification();
+  Future notification() async {
+    await NotificationService().initialize(listTask);
+    await NotificationService().cancelNotification();
     listTask.asMap().forEach((index, element) {
       if (element["status"] == true && element["isDone"] == false) {
         if (element["typeAlarm"] == "One Time") {

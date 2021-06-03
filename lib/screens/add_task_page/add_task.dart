@@ -275,8 +275,12 @@ class _AddPageState extends State<AddPage> {
         typeRepeat: _typeRepeat,
         subTasks: listSubTask,
         tags: _listSelectedTag,
-        periodTime: periodTime,
-        timeUnit: timeUnit,
+        periodTime: _selectedType == "Repeat" && _typeRepeat == "Period"
+            ? periodTime
+            : null,
+        timeUnit: _selectedType == "Repeat" && _typeRepeat == "Period"
+            ? timeUnit
+            : null,
       );
 
       ref.child(path).push().set({
@@ -295,7 +299,8 @@ class _AddPageState extends State<AddPage> {
         "isMiss": newTask.isMiss,
         "isShow": newTask.isShow,
         "isAlertMiss": newTask.isAlertMiss,
-        "isAlertRemind": newTask.isAlertRemind
+        "isAlertRemind": newTask.isAlertRemind,
+        "listTimeNotificationPeriod": null,
       });
 
       Navigator.pop(context);

@@ -368,8 +368,12 @@ class _EditPageState extends State<EditPage> {
         typeRepeat: _typeRepeat,
         subTasks: listSubTask,
         tags: _listSelectedTag,
-        periodTime: periodTime,
-        timeUnit: timeUnit,
+        periodTime: _selectedType == "Repeat" && _typeRepeat == "Period"
+            ? periodTime
+            : null,
+        timeUnit: _selectedType == "Repeat" && _typeRepeat == "Period"
+            ? timeUnit
+            : null,
       );
 
       ref.child(path).update({
@@ -387,6 +391,7 @@ class _EditPageState extends State<EditPage> {
         "isShow": false,
         "isAlertMiss": false,
         "isAlertRemind": false,
+        "listTimeNotificationPeriod": null,
       });
 
       Navigator.pop(context);

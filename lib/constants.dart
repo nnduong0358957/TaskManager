@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:timezone/data/latest.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
 
 final ref = FirebaseDatabase.instance.reference();
 final FirebaseAuth auth = FirebaseAuth.instance;
@@ -11,7 +13,6 @@ const kTextColor = Colors.white;
 DateTime kNow = DateTime.now();
 DateTime kTomorrow = kNow.add(Duration(days: 1));
 DateTime kYesterday = kNow.subtract(Duration(days: 1));
-
 
 Container buildColorGradient() {
   return Container(
@@ -54,5 +55,55 @@ Future changeStatus(Map<String, dynamic> task, bool newValue) async {
     "isShow": false,
     "isAlertMiss": true,
     "isAlertRemind": true
+  });
+}
+
+Future setListTimeAlarm(Map<String, dynamic> task) async {
+  final path = "users/${auth.currentUser.uid}/tasks";
+  DateTime taskDateTime = DateTime.parse(task["dateTime"]);
+
+  int listLength;
+  if (task["timeUnit"] == "Minutes")
+    listLength = 20;
+  else if (task["timeUnit"] == "Hours")
+    listLength = 12;
+  else if (task["timeUnit"] == "Days") listLength = 7;
+
+  List<String> listNotiTime = List<String>.generate(listLength, (index) {
+    if (index == 0)
+      return taskDateTime.toString();
+    else if (task["timeUnit"] == "Minutes") {
+      taskDateTime = taskDateTime.add(Duration(minutes: task["periodTime"]));
+    } else if (task["timeUnit"] == "Hours") {
+      taskDateTime = taskDateTime.add(Duration(hours: task["periodTime"]));
+    } else if (task["timeUnit"] == "Days") {
+      taskDateTime = taskDateTime.add(Duration(days: task["periodTime"]));
+    }
+    return taskDateTime.toString();
+  });
+
+  await ref.child(path).child(task["key"]).update({
+    "listTimeNotificationPeriod": listNotiTime,
+  });
+}
+
+Future resetTypeOfWork(
+    List<dynamic> listTask, List<dynamic> newListTypeOfWork) async {
+  listTask.forEach((task) async {
+    if (task['tags'] != null) {
+      List<dynamic> tags = new List<dynamic>.from(task['tags']);
+      List<dynamic> editTags = new List<dynamic>.from(tags);
+      bool isChange = false;
+      tags.forEach((element) {
+        if (!newListTypeOfWork.contains(element)) {
+          editTags.remove(element);
+          isChange = true;
+        }
+      });
+      if (isChange)
+        await ref
+            .child("users/${auth.currentUser.uid}/tasks/${task['key']}")
+            .update({"tags": editTags});
+    }
   });
 }

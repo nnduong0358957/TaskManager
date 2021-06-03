@@ -5,9 +5,9 @@ import 'package:todo_list_app/components/type_of_work/listTypeOfWork.dart';
 import 'package:todo_list_app/constants.dart';
 
 class DialogTypeOfWork extends StatefulWidget {
-  DialogTypeOfWork({this.typeOfWork, this.refreshPage});
+  DialogTypeOfWork({this.listTask, this.typeOfWork, this.refreshPage});
 
-  final List<dynamic> typeOfWork;
+  final List<dynamic> typeOfWork, listTask;
   final VoidCallback refreshPage;
 
   @override
@@ -66,6 +66,7 @@ class _DialogTypeOfWorkState extends State<DialogTypeOfWork> {
               ),
               onPressed: () async {
                 await updateFirebase(newList);
+                await resetTypeOfWork(widget.listTask, newList);
                 widget.refreshPage();
                 Navigator.of(context).pop();
               },
@@ -77,7 +78,6 @@ class _DialogTypeOfWorkState extends State<DialogTypeOfWork> {
   }
 
   void updateNewList(List<String> list) {
-    print(list);
     setState(() {
       newList = list;
     });

@@ -17,6 +17,7 @@ class Task {
   bool isShow;
   bool isAlertMiss;
   bool isAlertRemind;
+  List<DateTime> listTimeNotificationPeriod;
 
   Task(
       {@required this.title,
@@ -34,5 +35,6 @@ class Task {
       this.isMiss = true,
       this.isShow = false,
       this.isAlertMiss = false,
-      this.isAlertRemind = false});
+      this.isAlertRemind = false,
+      this.listTimeNotificationPeriod});
 }

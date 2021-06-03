@@ -8,6 +8,7 @@ import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 import 'package:flutter_native_timezone/flutter_native_timezone.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:todo_list_app/constants.dart';
 
 class NotificationService extends ChangeNotifier {
   final ref = FirebaseDatabase.instance.reference();
@@ -105,10 +106,10 @@ class NotificationService extends ChangeNotifier {
 
       int listLength;
       if (task["timeUnit"] == "Minutes")
-        listLength = 30;
+        listLength = 20;
       else if (task["timeUnit"] == "Hours")
-        listLength = 24;
-      else if (task["timeUnit"] == "Minutes") listLength = 7;
+        listLength = 12;
+      else if (task["timeUnit"] == "Days") listLength = 7;
 
       List<tz.TZDateTime> listNotiTime =
           List<tz.TZDateTime>.generate(listLength, (index) {
@@ -123,6 +124,8 @@ class NotificationService extends ChangeNotifier {
         }
         return notiTime;
       });
+
+      await setListTimeAlarm(task);
 
       listNotiTime.asMap().forEach((index, notificationTime) async {
         if (now.isBefore(notificationTime)) {
