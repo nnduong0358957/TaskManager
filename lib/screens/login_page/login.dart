@@ -388,7 +388,7 @@ class _MyLoginPageState extends State<MyLoginPage> {
       ),
       content: Text(
         content,
-        style: TextStyle(color: Colors.red, fontSize: 18),
+        style: TextStyle(color: Colors.red, fontSize: 14),
       ),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       actions: [

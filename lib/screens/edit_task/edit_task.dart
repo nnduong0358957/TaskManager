@@ -643,7 +643,7 @@ class _EditPageState extends State<EditPage> {
       ),
       content: Text(
         content,
-        style: TextStyle(color: Colors.red, fontSize: 18),
+        style: TextStyle(color: Colors.red, fontSize: 14),
       ),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       elevation: 24,

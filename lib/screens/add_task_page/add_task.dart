@@ -520,7 +520,7 @@ class _AddPageState extends State<AddPage> {
       ),
       content: Text(
         content,
-        style: TextStyle(color: Colors.red, fontSize: 18),
+        style: TextStyle(color: Colors.red, fontSize: 14),
       ),
       elevation: 24,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
